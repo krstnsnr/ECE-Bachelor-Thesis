@@ -117,6 +117,9 @@
   let meta = get-meta(program, doc-type, language)
   let is-german = (language == "de")
 
+  // Global document font (applies everywhere unless locally overridden)
+  set text(font: "New Computer Modern", size: 11pt, lang: language)
+
   // --- 1. Page Setup ---
   set page(
     paper: "a4",
@@ -199,13 +202,14 @@
 
     set page(header: none, footer: none, margin: (top:2cm, bottom: 2cm), background: none)
     
-    set text(font: ("Latin Modern Roman"), fill: white)
+    set text(font: ("New Computer Modern"), fill: white)
 
     table(
       columns: (1fr, 1fr), 
       align: (center + horizon, center + horizon),
       stroke: none,
-      image("graphics/company_logo-eps-converted-to.pdf", width: 7cm),
+      // image("graphics/company_logo-eps-converted-to.pdf", width: 7cm),
+      [],
       image("graphics/FHJ-EE_flat.pdf", width: 7cm)
     )
 
@@ -240,9 +244,11 @@
       #v(0.1fr)
       #text(size: 12pt)[#supervisors.join("\n ")]
       #v(pm)
-      #text(size: 18pt, weight: "bold")[#if is-german [Firmen-Betreuer:] else [Co-Supervision:]]
-      #v(0.1fr)
-      #text(size: 12pt)[#co-supervisors.join("\n ")]
+      #if co-supervisors.len() > 0 {
+        text(size: 18pt, weight: "bold")[#if is-german [Firmen-Betreuer:] else [Co-Supervision:]]
+        v(0.1fr)
+        text(size: 12pt)[#co-supervisors.join("\n ")]
+      }
       #v(0.7fr)
 
       #text(size: 14pt, weight: "bold")[#meta.location, #date.display("[day]. [month repr:long] [year]")]
