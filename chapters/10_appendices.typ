@@ -3,11 +3,13 @@
 // ==========================================================
 #pagebreak()
 #counter(heading).update(0)
-#set heading(numbering: "A.1")
+#set heading(numbering: none)
 
-= Full Telemetry Field Reference <app:telemetry>
-== `g_params` Table <app:g-params>
-== `g_sensors` Table <app:g-sensors>
+= Appendix <app:appendix>
 
-= Circuit Mapping Diagrams <app:diagrams>
+== Full Telemetry Field Reference <app:telemetry>
+=== `g_params` Table <app:g-params>
+=== `g_sensors` Table <app:g-sensors>
+
+== Circuit Mapping Diagrams <app:diagrams>
 // PCB / connector pin mapping diagrams (your circuit mapping contribution)

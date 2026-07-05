@@ -133,7 +133,7 @@ long }
       let toc-page = if outlines.len() > 0 { outlines.first().location().position().page } else { 0 }
 
       let all-h1 = query(heading.where(level: 1))
-        .filter(h => h.numbering != none and h.location().position().page > toc-page)
+        .filter(h => (h.numbering != none or h.outlined) and h.location().position().page > toc-page)
       let on-page   = all-h1.filter(h => h.location().position().page == abs-here)
       let before-page = all-h1.filter(h => h.location().position().page < abs-here)
       let current-chapter = if on-page.len() > 0 { on-page.first().body }

@@ -24,12 +24,15 @@
 
 === ADC (ADS7128) <sec:adc>
 // analog channel acquisition
+// cite @ADS71282020 for channel config, I2C protocol, and register details
 
 === Hall-Effect Speed Sensor (TLE4946-2L) <sec:hall>
 // limitations (no direction detection)
+// cite @TLE49462L2020 for switching thresholds and output characteristics
 
 == Actuation: Motor Drivers (BTN9970LV) <sec:motor-drivers>
 // half-bridge driving, current sensing
+// cite @BTN9970LV2021 for half-bridge specs, protection functions, and current sense
 
 == Wireless Bridge: ESP8266 (D1 mini) <sec:esp-bridge>
 
