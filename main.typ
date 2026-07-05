@@ -59,6 +59,7 @@
   @SchoberDTEG @BretterkliebeSensorik @OkornDiererMayerES @SallokerRTEA
   @BNO0552021 @UM3121_2025 @VL53L1X2024
   @BTN9970LV2021 @ADS71282020 @TLE49462L2020
+  @LaesserXRayLegacy2023
 ]
 
 #heading(numbering: none)[Bibliography]

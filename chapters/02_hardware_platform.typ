@@ -5,6 +5,7 @@
 
 == Main PCB (Inherited Design) <sec:main-pcb>
 // functional overview
+// cite @LaesserXRayLegacy2023 for the inherited PCB schematics/layout (XRay Legacy V1)
 
 == Microcontroller: STM32H533RE (Nucleo-H533RE) <sec:mcu>
 // core features relevant to the project
@@ -37,8 +38,6 @@
 == Wireless Bridge: ESP8266 (D1 mini) <sec:esp-bridge>
 
 == PCB Design Evaluation <sec:pcb-evaluation>
-
-=== Method Used to Identify Oversights <sec:pcb-method>
 
 === Findings <sec:pcb-findings>
 - Battery charging circuit unsuitable for LiIon/LiPo
