@@ -8,14 +8,19 @@
 
 == Microcontroller: STM32H533RE (Nucleo-H533RE) <sec:mcu>
 // core features relevant to the project
+// cite @Braunl2008 for the sensor/MCU/actuator architecture rationale
+// cite @STM32CubeMX2026 where you mention peripheral init / code generation
+// cite @UM3121_2025 for board/pin/clock details specific to the Nucleo-H533RE
 
 == Sensor Suite <sec:sensors>
 
 === Time-of-Flight Distance Sensors (VL53L1X) <sec:tof>
 // I2C addressing scheme
+// cite @VL53L1X2024 for sensor specs, I2C protocol, and ranging performance
 
 === IMU (BNO055) <sec:imu>
 // 9-axis orientation sensing
+// cite @BNO0552021 for sensor fusion modes, register map, and calibration procedure
 
 === ADC (ADS7128) <sec:adc>
 // analog channel acquisition

@@ -54,4 +54,5 @@
 
 #include "chapters/10_appendices.typ"
 
-//#bibliography("helpers/bib/ECEtempBib.bib", style: "ieee")
+#heading(numbering: "A.1")[Bibliography]
+#bibliography("helpers/bib/ECEtempBib.bib", style: "ieee", title: none)

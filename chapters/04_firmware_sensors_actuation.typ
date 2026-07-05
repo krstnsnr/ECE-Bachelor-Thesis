@@ -13,6 +13,7 @@
 
 == Actuator Control <sec:actuator-control>
 // motor_control, servo_steering, pid, control_loop
+// cite @Skogestad2003 where you justify the PID tuning method used
 
 // Extended Logging (distance sensor data, actual vs. set speed, IMU data)
 // mention here if implemented as part of control_loop / telemetry_fields
