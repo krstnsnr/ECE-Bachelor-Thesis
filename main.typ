@@ -7,12 +7,11 @@
 
 #show: doc => iee-thesis(
   // Metadata
-  title: "Your Thesis Title",
-  subtitle: "Optional Subtitle",
-  author: "Forename Surename",
+  title: "Development of an automated test and tuning platform for CrazyCar using the AI-MotionLab",
+  //subtitle: "Optional Subtitle",
+  author: "Kristian Seiner",
   supervisors: (
-    "Prof. Dr. Max Mustermann",
-    "Dipl.-Ing. Jane Doe"
+    "DI Florian Mayer, BSc",
   ),
   
   // Program: PROGRAM_ECE, PROGRAM_MEC, PROGRAM_ECM, PROGRAM_STM, PROGRAM_EEM
@@ -37,7 +36,7 @@
 
 #include "chapters/introduction.typ"
 
-#include "chapters/methods.typ"
+//#include "chapters/methods.typ"
 
 #include "chapters/conclusion.typ"
 

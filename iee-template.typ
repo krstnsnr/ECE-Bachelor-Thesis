@@ -167,13 +167,14 @@ long }
 
     set page(header: none, footer: none, margin: (top:2cm, bottom: 2cm), background: none)
     
-    set text(font: ("Latin Modern Roman"), fill: white)
+    set text(font: ("New Computer Modern"), fill: white)
 
     table(
-      columns: (1fr, 1fr), 
+      columns: (1fr, 1fr),
       align: (center + horizon, center + horizon),
       stroke: none,
-      image("assets/graphics/logos/company_logo-eps-converted-to.pdf", width: 7cm),
+      // image("assets/graphics/logos/company_logo-eps-converted-to.pdf", width: 7cm),
+      none,
       image("assets/graphics/logos/FHJ-EE_flat-eps-converted-to.pdf", width: 7cm)
     )
 
