@@ -34,10 +34,26 @@
   doc
 )
 
-#include "chapters/introduction.typ"
+#include "chapters/01_introduction.typ"
 
-//#include "chapters/methods.typ"
+#include "chapters/02_state_of_the_art.typ"
 
-#include "chapters/conclusion.typ"
+#include "chapters/03_hardware_platform.typ"
+
+#include "chapters/04_system_architecture.typ"
+
+#include "chapters/05_firmware_design.typ"
+
+#include "chapters/06_ai_motionlab_integration.typ"
+
+#include "chapters/07_evaluation.typ"
+
+#include "chapters/08_discussion.typ"
+
+#include "chapters/09_future_work.typ"
+
+#include "chapters/10_conclusion.typ"
+
+#include "chapters/11_appendices.typ"
 
 #bibliography("helpers/bib/ECEtempBib.bib", style: "ieee")
