@@ -3,9 +3,6 @@
 == Evaluation Methodology <sec:eval-methodology>
 // what was tested, and how
 
-== Communication Reliability <sec:comm-reliability>
-// OTA success rate, CRC verification, message latency
-
 == Sensor Performance <sec:sensor-performance>
 // range/accuracy of ToF, IMU stability, ADC readings
 

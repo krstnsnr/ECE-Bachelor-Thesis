@@ -40,9 +40,9 @@
 
 #include "chapters/03_hardware_platform.typ"
 
-#include "chapters/04_system_architecture.typ"
+#include "chapters/04_firmware_sensors_actuation.typ"
 
-#include "chapters/05_firmware_design.typ"
+#include "chapters/05_firmware_state_machine.typ"
 
 #include "chapters/06_ai_motionlab_integration.typ"
 
@@ -50,10 +50,8 @@
 
 #include "chapters/08_discussion.typ"
 
-#include "chapters/09_future_work.typ"
+#include "chapters/09_conclusion.typ"
 
-#include "chapters/10_conclusion.typ"
+#include "chapters/10_appendices.typ"
 
-#include "chapters/11_appendices.typ"
-
-#bibliography("helpers/bib/ECEtempBib.bib", style: "ieee")
+//#bibliography("helpers/bib/ECEtempBib.bib", style: "ieee")

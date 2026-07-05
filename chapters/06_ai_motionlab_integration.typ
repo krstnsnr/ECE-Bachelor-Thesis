@@ -1,4 +1,8 @@
 = Integration with the AI-MotionLab Testsuite <ch:integration>
+// Scope note: the GUI/testsuite itself is not this thesis's contribution.
+// This chapter should be framed from the firmware side -- what the STM32
+// exposes (GET/SET, telemetry fields) that the testsuite consumes -- with
+// the GUI/testsuite described only as much as needed for context.
 
 == Testsuite Architecture Overview <sec:testsuite-architecture>
 // dock-based PyQt5 app, relevant modules only

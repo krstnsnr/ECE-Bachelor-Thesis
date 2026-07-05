@@ -6,9 +6,6 @@
 == Microcontroller-Based Real-Time Control Architectures <sec:sota-mcu>
 // STM32 in embedded robotics
 
-== Wireless Firmware Update Strategies <sec:sota-ota>
-// OTA over UART/WiFi bridges, ROM bootloader-based updates
-
 == Sensor Fusion for Short-Range Obstacle/Orientation Sensing <sec:sota-sensor-fusion>
 // ToF + IMU
 
