@@ -36,23 +36,21 @@
 
 #include "chapters/01_introduction.typ"
 
-#include "chapters/02_state_of_the_art.typ"
+#include "chapters/02_hardware_platform.typ"
 
-#include "chapters/03_hardware_platform.typ"
+#include "chapters/03_firmware_sensors_actuation.typ"
 
-#include "chapters/04_firmware_sensors_actuation.typ"
+#include "chapters/04_firmware_state_machine.typ"
 
-#include "chapters/05_firmware_state_machine.typ"
+#include "chapters/05_ai_motionlab_integration.typ"
 
-#include "chapters/06_ai_motionlab_integration.typ"
+#include "chapters/06_evaluation.typ"
 
-#include "chapters/07_evaluation.typ"
+#include "chapters/07_discussion.typ"
 
-#include "chapters/08_discussion.typ"
+#include "chapters/08_conclusion.typ"
 
-#include "chapters/09_conclusion.typ"
-
-#include "chapters/10_appendices.typ"
+#include "chapters/09_appendices.typ"
 
 // DUMMY: forces every entry in the .bib file to render in the bibliography
 // for review purposes. Remove once real in-text @citations replace this.
