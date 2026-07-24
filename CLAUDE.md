@@ -35,11 +35,104 @@ The **non-goals** from the original registration are unchanged:
 - No rebuild or modification of the AI-MotionLab itself ("Umbau des
   AI-MotionLab").
 - No PCB design work on the CrazyCar platform ("PCB-Design der CrazyCar
-  Plattform"). The main PCB is an inherited design (see `sec:main-pcb` in
-  chapter 2, cited via `@LaesserXRayLegacy2023`). Note that the evaluation
-  chapter has a section summarizing PCB oversight impact on testing
-  (`sec:pcb-impact-summary`); that section covers a hardware issue found
-  while testing, it is not a PCB design contribution.
+  Plattform"). The main PCB was designed by someone else (A. Läßer, cited
+  via `@LaesserXRayLegacy2023`, see `sec:main-pcb` in chapter 2) specifically
+  for this STM32-based generation of the platform. **Correction: this is not
+  a legacy or carried-over board reused from an older generation.** It is a
+  new design that had never been brought up or tested before this thesis;
+  bringing it up and finding its problems firsthand was part of this
+  thesis's own work (see the "first attempt at bringing that hardware up"
+  framing in `sec:motivation`), not something inherited from prior testing.
+  Don't describe the PCB as "inherited" or "carried over" anywhere in the
+  thesis; describe it as a pre-existing design this thesis builds firmware
+  for and evaluates, not one it created or one that was previously verified.
+  Note that the evaluation chapter has a section summarizing PCB oversight
+  impact on testing (`sec:pcb-impact-summary`); that section covers hardware
+  issues found while testing, not a PCB design contribution.
+
+## Background Research: Crazy Car Competition, Curriculum, and the AI-MotionLab
+
+Web research done 2026-07-24 to ground the historical/institutional framing
+used in the introduction and motivation sections. Sources are official
+FH JOANNEUM pages and a course GitHub org, all live at research time; verify
+again before citing if a chapter needs a formal reference, since these are
+web sources that can change or move.
+
+**The public "Crazy Car" competition** is a separate thing from this thesis's
+CrazyCar research platform, though the two share a name and lineage. It is
+an autonomous 1:18-scale model car race that originated in Switzerland;
+FH JOANNEUM students first took part in 2007, and the race has been hosted
+at FH JOANNEUM itself every year since 2008. It is organized by the
+Institute of Electronic Engineering and overseen by DI Florian Mayer
+(this thesis's supervisor), with school and university teams programming
+their own cars to complete an obstacle course with no remote control.
+FH JOANNEUM provides ready-made "Controller Package" starter kits built on
+either a Texas Instruments MSP430 or an Arduino, documented in manuals such
+as the "Crazy Car Controller Arduino V2.0" manual.
+(Sources:
+[Crazy Car project page](https://www.fh-joanneum.at/en/project/crazycar/),
+[Crazy Car competition press release](https://www.fh-joanneum.at/presse/technikspass-beim-crazy-car-wettbewerb-an-der-fh-joanneum/),
+[Arduino V2.0 controller manual](https://cdn.fh-joanneum.at/media/sites/1/2016/02/CrazyCarController_Arduino2.0_Manual.pdf).)
+
+**The CrazyCar platform is also the lab vehicle for the ECE bachelor's
+3rd-semester "Embedded Systems" course**, the same course already cited in
+this thesis as `@OkornDiererMayerES`. That course's public lab materials
+(GitHub org `Electronic-and-Computer-Engineering/EmbeddedSystems`) target an
+MSP430F5335-based Crazy Car and walk students through a 10-chapter, three
+layer HAL/DL/AL architecture (Hardware Abstraction Layer, Driver Layer,
+Application Layer): GPIO, clock system, and TimerB0 first, then PWM
+actuation, SPI, and an ST7565 LCD, then ADC with DMA and Sharp IR distance
+sensors, and finally driving algorithms (state machines, PID control,
+lane-following). This is useful grounding for the motivation and history
+sections: the MSP430-based, layered, sensor-plus-actuator-plus-state-machine
+architecture taught in that course is the direct academic predecessor of the
+STM32-based firmware this thesis builds, which follows the same broad shape
+(sensor drivers, actuator control, a driving state machine) on newer,
+research-grade hardware and with an AI-MotionLab-integrated test and tuning
+workflow instead of a teaching lab exercise.
+(Source: [EmbeddedSystems course repository](https://github.com/Electronic-and-Computer-Engineering/EmbeddedSystems).)
+
+**Curriculum naming caveat:** FH JOANNEUM's current curriculum page
+distinguishes an active curriculum from a discontinued one for older
+cohorts. Students who started in 2023 (as documented by a public syllabus
+for "Embedded Computing 2 (STECE-2023)") are on the **older, discontinued**
+track: "Embedded Systems" in semester 3 (8 ECTS, 6 SWS, German, the MSP430
+Crazy Car course above), "Embedded Computing 1" in semester 4, and
+"Embedded Computing 2" in semester 5 (object-oriented C++, Linux systems
+programming, embedded Linux hardware interfaces). Newer cohorts instead take
+differently named, differently scoped courses ("Embedded Systems" 7 ECTS in
+semester 3, "Embedded Linux Development" in semester 4, "Embedded
+Applications Development" in semester 5). When citing or describing "the
+Embedded Systems lecture," it means the semester-3, MSP430/Crazy-Car-based
+course on the older/2023-cohort track, matching `@OkornDiererMayerES`; don't
+conflate it with the newer curriculum's course of the same name, which has
+different content and ECTS.
+(Sources:
+[ECE bachelor curriculum](https://www.fh-joanneum.at/elektronik-und-computer-engineering/bachelor/en/my-studies/curriculum/),
+[Embedded Computing 2 (STECE-2023) syllabus](https://www.faschingbauer.me/about/site/work-in-progress/fh-joanneum/2023/ws2025-26/syllabus.html).)
+
+**The AI-MotionLab is a real, separate lab facility**, not just the name of
+the PySide testsuite (correction: the GUI is built with PySide6, not PyQt5;
+`pyproject.toml` in the companion repo pins `PySide6`, and the companion
+repo's own `CLAUDE.md` calling it "PyQt5" is stale). The AI-MotionLab is a
+motion-capture-based research infrastructure run by FH JOANNEUM's Electronic
+Engineering Institute (headed by Christian Vogel), built for "self-learning,
+mobile and connected cyber-physical systems" research with partners TU Graz
+and Montanuniversität Leoben, funded by the Styrian regional government from
+February 2018 to August 2019. Its core hardware is a twelve-camera optical
+tracking system on a truss covering roughly 7 by 7 by 3 meters, with
+sub-millimeter positional accuracy at 360 fps, able to track up to 14 rigid
+bodies at once (the same class of system as the OptiTrack integration in
+`src/ai_motionlab/broadcast/`). The CrazyCar project's "Automated Testsuite"
+is a separate PySide application built on top of this shared lab facility,
+not the lab itself. Kristian's colleague developed the testsuite alongside
+this thesis's firmware, in parallel rather than as pre-existing
+infrastructure, so don't describe it as something that already existed
+before this thesis started. When the introduction explains "the
+AI-MotionLab," it should distinguish the general-purpose motion-capture lab
+from the CrazyCar-specific testsuite software that consumes its tracking
+data.
+(Source: [aiMotionLab project page](https://www.fh-joanneum.at/en/projekt/aimotionlab-artificial-intelligence-in-motion-laboratory/).)
 
 ## Companion Source Repository and Authorship Boundaries
 
@@ -58,7 +151,8 @@ different relevance to this thesis:
   (`motor_control`, `servo_steering`, `pid`, `control_loop`), the state
   machine (`state_machine.c`, `event_detection.c`), and the OTA/telemetry
   protocol (`ota.c`, `telemetry_fields.c`).
-- **`src/ai_motionlab/`** (the PyQt5 "Automated Testsuite" GUI): not
+- **`src/ai_motionlab/`** (the PySide "Automated Testsuite" GUI, developed by
+  a colleague alongside this thesis's firmware, not beforehand): not
   Kristian's work, with one exception. **`src/ai_motionlab/mapping/`** (track
   geometry loading and the manual circuit definition, `track_logic.py` and
   `circuit.json`) is his contribution and belongs in the thesis; it maps to
@@ -160,7 +254,31 @@ the colleague's.
 ## Writing Style
 
 - Never use an em dash (—) in thesis prose or in this file. Rewrite with a
-  comma, a period and a new sentence, a colon, or parentheses instead.
+  comma, a period and a new sentence, or parentheses instead.
 - Use a hyphen (-) only when grammar requires it (compound modifiers like
   "level-1", "top-level", "STM32-based"); prefer rewording to avoid it
   otherwise.
+- Use a colon only to introduce an actual formatted list (a `-` bullet
+  list, or an inline enumeration that is genuinely a list of items) and
+  only when there's no easy way to write the sentence without it. Don't
+  use a colon to introduce a single elaboration, example, or explanatory
+  clause in running prose; rewrite as two sentences, or join with a comma
+  or "namely"/"including" instead. Heading-style colons in chapter section
+  titles (e.g. "Microcontroller: STM32H533RE") are an existing, separate
+  convention and are unaffected by this rule.
+- Keep sentences short and flat, not nested ("verschachtelt"). One sentence
+  should carry one idea. If a sentence needs more than one "since"/"that"/
+  "which" clause stacked together, or buries its main point after several
+  subordinate clauses, split it into two or three plain sentences instead.
+  This matters more than trimming a sentence to a target length; a short
+  sentence that still crams two reasons and a conclusion together is not
+  the goal, clarity is.
+- Focus thesis prose on what was achieved, not on what wasn't done or on
+  which earlier framing was wrong. Never write a sentence that states an
+  assumption and then negates it in the same breath (for example, "the
+  testsuite was developed alongside the firmware, instead of before").
+  Nobody reading the finished thesis cares what an earlier draft assumed;
+  write the current understanding directly, as if it had been known from
+  the start. This applies to editing passes on already-written chapters
+  too: when a fact changes, rewrite the sentence clean rather than layering
+  a correction onto the old one.

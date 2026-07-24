@@ -3,9 +3,12 @@
 == Chassis: XRAY M18 Pro LiPo 4WD <sec:chassis>
 // starting point / rationale for choice
 
-== Main PCB (Inherited Design) <sec:main-pcb>
+== Main PCB (Pre-Existing Design) <sec:main-pcb>
 // functional overview
-// cite @LaesserXRayLegacy2023 for the inherited PCB schematics/layout (XRay Legacy V1)
+// cite @LaesserXRayLegacy2023 for the PCB schematics/layout (XRay Legacy V1)
+// designed by A. Lasser specifically for this STM32 generation, but never
+// built up or tested before this thesis; frame the bring-up as this
+// thesis's own work, not something inherited/carried over from a prior gen
 
 == Microcontroller: STM32H533RE (Nucleo-H533RE) <sec:mcu>
 // core features relevant to the project

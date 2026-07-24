@@ -5,7 +5,7 @@
 // the GUI/testsuite described only as much as needed for context.
 
 == Testsuite Architecture Overview <sec:testsuite-architecture>
-// dock-based PyQt5 app, relevant modules only
+// dock-based PySide app, relevant modules only
 
 == Car Communication Module <sec:car-comm-module>
 // bridging car_ota.py into the GUI
