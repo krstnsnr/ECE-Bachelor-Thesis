@@ -1,10 +1,31 @@
 = Hardware Platform <ch:hardware>
 
 == Chassis: XRAY M18 Pro LiPo 4WD <sec:chassis>
-// starting point / rationale for choice
+
+The chassis this thesis's hardware baseline builds on is the XRAY M18 Pro
+LiPo, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from XRAY
+@MichaelsRCXRAYM18Pro2026. It measures 220mm long on a 150mm wheelbase and
+weighs about 165g standalone. The main chassis plate is CNC-machined
+from 1.6mm carbon fiber, thin enough to flex a little on a low-grip
+surface but stiff enough to hold its line at speed. XRAY's Multi-Flex
+Technology top deck lets that flex be tuned separately at the front and
+rear axle, a feature carried over from XRAY's 1/10-scale touring cars.
+
+Two things about the M18 Pro matter for how CrazyCar uses it. First, its
+drivetrain and suspension are fully adjustable, with composite ball
+differentials at both axles, a 1:2.5 drive ratio with swappable 36T and
+42T spur gears and assorted pinions, and coil-over shocks with adjustable
+camber, caster, and toe. That range covers everything from a fast,
+predictable setup on a smooth indoor track to a looser one that tolerates
+a rougher surface. Second, the kit ships bare. Radio, servo, ESC, motor,
+and battery are not included. The electronics have to be built up from
+scratch, which is exactly the gap this thesis's firmware and this
+platform's PCB (@sec:main-pcb) fill. Being a widely sold competition kit
+also means worn or crashed parts are easy to source and replace, which
+matters when a fleet of these cars is driven by students.
 
 #figure(
-  image("/assets/pictures/XRAY_M18_Pro_LiPo.jpg", width: 70%),
+  image("/assets/pictures/XRAY_M18_Pro_LiPo.jpg", width: 45%),
   caption: [XRAY M18 Pro LiPo 4WD chassis],
 ) <fig:chassis>
 #align(center, text(size: 9pt, style: "italic")[Image source: @MKRacingXRAYM18Pro2026])
