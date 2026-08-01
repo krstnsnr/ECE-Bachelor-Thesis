@@ -3,6 +3,12 @@
 == Chassis: XRAY M18 Pro LiPo 4WD <sec:chassis>
 // starting point / rationale for choice
 
+#figure(
+  image("/assets/pictures/XRAY_M18_Pro_LiPo.jpg", width: 70%),
+  caption: [XRAY M18 Pro LiPo 4WD chassis],
+) <fig:chassis>
+#align(center, text(size: 9pt, style: "italic")[Image source: @MKRacingXRAYM18Pro2026])
+
 == Main PCB (Pre-Existing Design) <sec:main-pcb>
 // functional overview
 // cite @LaesserXRayLegacy2023 for the PCB schematics/layout (XRay Legacy V1)

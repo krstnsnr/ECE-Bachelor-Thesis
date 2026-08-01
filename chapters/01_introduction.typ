@@ -2,27 +2,26 @@
 
 == Motivation and Context <sec:motivation>
 
-Autonomous driving research increasingly relies on small-scale test
-platforms to make control, perception, and system integration work
-reproducible outside of a full-size vehicle. A 1/18-scale car keeps the same
-core problems, sensing the environment, actuating steering and throttle,
-and reacting in real time, while keeping iteration cycles short and testing
-possible indoors on a small track. Within the Electronics and Computer
-Engineering (ECE) programme at FH JOANNEUM, that platform is CrazyCar, and
-it is not a new one.
+Embedded systems are easier to learn by building something concrete and
+fun, not just isolated exercises on a devboard. Within the Electronics and
+Computer Engineering (ECE) programme at FH JOANNEUM, CrazyCar is that
+concrete project. It is a small, autonomous 1/18-scale racing car that
+gives students one complex system to work on, namely sensing the
+environment, actuating steering and throttle and reacting in real time.
+Iteration cycles stay short, and the hardware is cheap to replace broken parts.
 
-CrazyCar is also the vehicle used in the third-semester "Embedded Systems"
-lecture, where students build a layered (HAL, DL, AL) firmware stack for it
-on an MSP430F5335 microcontroller as a single-semester lab exercise, covering
-GPIO, timers, and PWM, then SPI and a distance-sensor driver, then a first
-driving state machine with PID control @OkornDiererMayerES. That generation
-of the platform was built to teach embedded systems fundamentals within one
-semester. Within that scope, the application layer, the state machine and 
-PID control students build in the
-last part of the course, can already be tuned to some degree, but only the
-slow and manual way. Changing a gain means editing code, recompiling, and reflashing
-over a wired debugger session, and there is no infrastructure to gather
-quantifiable, repeatable performance data across many runs.
+The third-semester "Embedded Systems" lecture uses that same CrazyCar as
+its lab vehicle. Students build a layered (HAL, DL, AL) firmware stack for
+it on an MSP430F5335 microcontroller as a single-semester lab exercise. It 
+covers GPIO, timers, PWM, SPI and a distance-sensor driver as well as 
+a first driving state machine with PID control @OkornDiererMayerES. That
+generation of the platform was built to teach embedded systems fundamentals
+within one semester. Within that scope, the application layer, the state
+machine and PID control students build in the last part of the course, can
+already be tuned to some degree, but only the slow and manual way. Changing
+a gain means editing code, recompiling, and reflashing over a wired
+debugger session, and there is no infrastructure to gather quantifiable,
+repeatable performance data across many runs.
 
 This thesis is about modernizing that platform lineage into one that
 supports this kind of ongoing, research-grade testing and tuning. 

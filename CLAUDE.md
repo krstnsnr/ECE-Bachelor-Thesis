@@ -250,6 +250,16 @@ the colleague's.
 - Declarations (`Eidesstattliche Erklärung` / `Declaration of Honor`) are
   legally required honor statements for FH JOANNEUM submissions; don't
   reword their content casually.
+- **Never put a `@citation` inside a `figure(caption: [...])`.** The List of
+  Figures outline entry (`show outline.entry.where(level: 1)` in
+  `iee-template.typ`, around the `#cap.body` line) re-renders the full
+  caption body, and that list sits in the frontmatter before chapter 1. A
+  citation embedded in a caption gets "seen" there first and grabs a lower
+  IEEE reference number than citations that appear earlier in the actual
+  chapter text, which is confusing to a reader. Put image/source credits in
+  a separate line under the figure instead, for example
+  `#align(center, text(size: 9pt, style: "italic")[Image source: @key])`,
+  as done for `@fig:chassis` in `sec:chassis`.
 
 ## Writing Style
 
@@ -282,3 +292,9 @@ the colleague's.
   the start. This applies to editing passes on already-written chapters
   too: when a fact changes, rewrite the sentence clean rather than layering
   a correction onto the old one.
+- When editing a paragraph, reread it together with the paragraph right
+  before and right after it, not in isolation. Adjacent paragraphs drift
+  out of sync easily, for example two paragraphs in a row both opening
+  with "CrazyCar is ..." after separate edits. Check that the paragraph
+  transitions still flow and rework the opening/transition sentence if a
+  fix to one paragraph made it repeat or clash with its neighbor.
