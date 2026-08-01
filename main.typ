@@ -18,7 +18,7 @@
   program: PROGRAM_ECE, 
   language: "en", // "en" or "de"
   doc-type: "thesis", // "thesis" or "report"
-  show-list-of: ("figures"),
+  show-list-of: ("figures", "glossary"),
   
   // Content from abstract.tex and acknowledgments.tex
   abstract-de: [

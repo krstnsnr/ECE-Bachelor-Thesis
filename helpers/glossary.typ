@@ -6,7 +6,8 @@
 
 // Hints:
 // * Add list of terms in file glossary-definitions.typ
-// * Usage within text will then be #gls(<key>) or plurals #glspl(<key>)
+// * Usage within text will then be #gls("key") or plurals #glspl("key")
+//   (a plain string, not a Typst label)
 
 
 
