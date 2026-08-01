@@ -380,7 +380,15 @@ long }
         let fill = it.fill
         context {
           let pg = counter(page).at(it.element.location()).first()
-          let num = numbering(cap.numbering, ..cap.counter.at(it.element.location()))
+          // Don't call cap.numbering directly: it closes over
+          // counter(heading.where(level: 1)).get(), which resolves against
+          // the *current* context (here, the front-matter List of Figures,
+          // before chapter 1 even starts) rather than the figure's own
+          // position, producing "Figure 0.1" instead of "Figure 2.1".
+          // Recompute both counters with .at(location) instead.
+          let chapter-num = counter(heading.where(level: 1)).at(it.element.location()).first()
+          let fig-num = cap.counter.at(it.element.location()).first()
+          let num = numbering("1.1", chapter-num, fig-num)
           block(
             link(it.element.location(), text(fill: black)[*#cap.supplement #num:* #cap.body #if fill != none { box(width: 1fr, fill) } else { h(1fr) } #pg])
           )
