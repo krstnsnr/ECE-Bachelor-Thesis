@@ -221,8 +221,54 @@ alongside heading, yaw rate, and acceleration, instead of trusting the
 fused output unconditionally.
 
 === ADC (ADS7128) <sec:adc>
-// analog channel acquisition
-// cite @ADS71282020 for channel config, I2C protocol, and register details
+
+The platform's external ADC is a Texas Instruments ADS7128, an
+8-channel, 12-bit, multiplexed #gls("sar") ADC in a 3mm x 3mm, 16-pin
+WQFN package @ADS71282020. Each of its eight channels can be
+independently configured as an analog input, a digital input, or a
+GPIO output, and an internal oscillator drives the conversion process,
+so the device needs no clock from the host. It sits on the same I2C
+bus as the rest of the sensor stack (@sec:i2c-stack), giving the
+firmware extra analog channels without using any of the STM32's own
+ADC pins.
+
+#figure(
+  image("/assets/pictures/ads7128.png", width: 50%),
+  caption: [ADS7128, WQFN-16 package],
+) <fig:ads7128>
+#align(center, text(size: 9pt, style: "italic")[Image source: @TIADS7128ProductPage2026])
+
+The ADS7128 answers to one of eight I2C addresses, selected by two
+external resistors on its ADDR pin rather than a single logic-level
+pin. This platform ties one of those resistors to 100kOhm and leaves
+the other unpopulated. The datasheet's address table maps that
+combination to 0x10. All register access goes through a two-byte
+command, an opcode followed by a register address. This platform's
+driver uses only two of the opcodes the datasheet defines, 0x08 for a
+single register write and 0x10 for a single register read. A finished
+12-bit conversion result is read back MSB-justified across two bytes,
+the upper eight bits followed by the lower four bits padded with
+zeros. The driver reassembles the two bytes into a single 12-bit value
+with a shift and a combine.
+
+The device powers up in manual mode, and this platform leaves it
+there instead of switching to auto-sequence or autonomous mode. In
+manual mode the host selects a channel with a register write, instead
+of toggling the multiplexer directly. This platform's driver writes
+the desired channel to the CHANNEL_SEL register before every
+conversion, and enables 32x oversampling through the OSR_CFG register,
+the datasheet's built-in averaging filter, for extra settling time and
+noise reduction. After switching to a new channel, the driver reads it
+twice and discards the first conversion. That way a stale sample left
+over from the previous channel is never mistaken for a valid reading.
+
+This platform uses three of the eight channels. One reads the
+battery voltage through a 10kOhm/18kOhm divider. The other two read
+the negative and positive-side current-sense outputs of the
+BTN9970LV half-bridge motor drivers (@sec:motor-drivers). Routing
+these three signals through the ADS7128 keeps them on the same I2C
+bus as the rest of the sensor stack, instead of requiring dedicated
+analog routing back to the STM32's own ADC inputs.
 
 === Hall-Effect Speed Sensor (TLE4946-2L) <sec:hall>
 // limitations (no direction detection)

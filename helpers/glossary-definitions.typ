@@ -91,6 +91,9 @@
     (
       key: "lsb", short: "LSB", long: "Least Significant Bit", description: [The smallest increment a digital register can represent, used as the unit for how a raw sensor reading scales to a physical quantity.],
     ),
+    (
+      key: "sar", short: "SAR", long: "Successive Approximation Register", description: [An ADC architecture that resolves each output bit in turn through a binary search against a comparator, one bit per conversion step.],
+    ),
 )
 
 // Hints:
