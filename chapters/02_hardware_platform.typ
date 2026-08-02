@@ -107,12 +107,27 @@ returning photons. That timing-based principle makes the reported
 distance largely independent of the target's color or reflectance, which
 matters on a track where the car has to range off wood barriers reliably.
 
-The module is a fully integrated LGA12 package measuring
-4.9 x 2.5 x 1.56mm, small enough to mount directly on the front and side
-edges of the chassis. It communicates over #gls("i2c") at up to 400kHz.
-It also exposes an active-low XSHUT pin for hardware shutdown and a
-GPIO1 interrupt output. This platform's firmware uses XSHUT to sequence
-startup when more than one sensor shares the bus (@sec:i2c-stack).
+#figure(
+  grid(
+    columns: (1fr, 1fr),
+    column-gutter: 1em,
+    align: horizon,
+    image("/assets/pictures/VL53L1X_Pimoroni_Breakout.jpg", width: 60%),
+    image("/assets/pictures/VL53L1X_Pimoroni_Breakout_Back.jpg", width: 60%),
+  ),
+  caption: [VL53L1X distance sensor, Pimoroni breakout board, front and back.],
+) <fig:tof-sensor>
+#align(center, text(size: 9pt, style: "italic")[Image source: @PimoroniVL53L1XBreakout2026])
+
+The bare VL53L1X is a fully integrated LGA12 package measuring
+4.9 x 2.5 x 1.56mm. On this platform each of the three sensors sits on
+a Pimoroni breakout board (@fig:tof-sensor), which brings the module's
+pins out to a row of solder pads. The breakout is still small enough
+to mount on the chassis. It
+communicates over #gls("i2c") at up to 400kHz. It also exposes an
+active-low XSHUT pin for hardware shutdown and a GPIO1 interrupt
+output. This platform's firmware uses XSHUT to sequence startup when
+more than one sensor shares the bus (@sec:i2c-stack).
 
 Ranging behavior is controlled through three parameters. Distance mode
 selects between short, medium, and long range. It trades maximum
@@ -152,8 +167,58 @@ timing budget, so every sensor starts its next measurement as soon as
 the previous one finishes.
 
 === IMU (BNO055) <sec:imu>
-// 9-axis orientation sensing
-// cite @BNO0552021 for sensor fusion modes, register map, and calibration procedure
+
+The platform's #gls("imu") is a Bosch Sensortec BNO055, a single package
+that combines a triaxial 14-bit accelerometer, a triaxial 16-bit
+gyroscope rated to 2000 degrees per second, a triaxial magnetometer, and
+a 32-bit Cortex-M0+ microcontroller running Bosch's own sensor fusion
+firmware @BNO0552021. Rather than handing raw accelerometer, gyroscope,
+and magnetometer samples to the host, the BNO055 fuses them on-chip and
+reports ready-to-use orientation data over #gls("i2c"). That leaves the
+STM32 free to run its control loop and state machine instead of a
+fusion filter of its own.
+
+The BNO055 exposes both non-fusion modes, where individual sensors can
+be read raw, and fusion modes, where the on-chip algorithm combines
+them. This platform runs it in NDOF mode, the fusion mode that uses all
+nine degrees of freedom (accelerometer, gyroscope, and magnetometer
+together) to compute absolute orientation referenced to magnetic north.
+NDOF also keeps fast magnetometer calibration turned on, which brings
+the magnetometer to a usable calibration state more quickly than the
+alternative NDOF_FMC_OFF mode. In this mode the fusion algorithm
+separates the accelerometer's raw signal into a gravity vector and a
+linear acceleration term, and reports orientation as both quaternion
+and Euler-angle data.
+
+On the #gls("i2c") side the BNO055 answers to one of two fixed addresses,
+selected by the level of its COM3 pin, 0x29 when COM3 is high and 0x28
+when it is low. This platform's firmware talks to it at 0x28, so COM3
+is wired low on the #gls("pcb"). At startup the firmware checks the
+chip's fixed identification value before doing anything else. It only
+issues a hardware reset if that check fails. A reset costs on the
+order of a second, while an already-booted sensor answers immediately.
+
+This platform's driver does not read the BNO055's Euler-angle heading
+register directly. Instead it reads the quaternion output, where the
+register map fixes 16384 #glspl("lsb") to one unitless quaternion
+component, and computes yaw from the resulting w, x, y, z values with
+an arctangent. Reading the quaternion this way avoids the
+discontinuities and gimbal-lock artifacts that Euler-angle output is
+prone to. Yaw rate is read straight from the gyroscope's Z-axis
+register, where 16 #glspl("lsb") correspond to one degree per second,
+and linear acceleration, with gravity already removed by the fusion
+algorithm, is read where 100 #glspl("lsb") correspond to one meter per
+second squared.
+
+Because the fusion algorithm calibrates continuously in the
+background, the BNO055 also reports a live calibration status. One
+field covers the system as a whole, and one covers each of the three
+physical sensors. Each field packs two bits, with 3 meaning fully
+calibrated and 0 meaning uncalibrated. Until the magnetometer field in
+particular reaches a full calibration, the fused heading can drift.
+That is why this platform's firmware surfaces calibration status
+alongside heading, yaw rate, and acceleration, instead of trusting the
+fused output unconditionally.
 
 === ADC (ADS7128) <sec:adc>
 // analog channel acquisition

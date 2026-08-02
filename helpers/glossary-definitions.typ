@@ -88,6 +88,9 @@
     (
       key: "fov", short: "FoV", long: "Field of View", description: [The angular extent of the scene a sensor can observe.],
     ),
+    (
+      key: "lsb", short: "LSB", long: "Least Significant Bit", description: [The smallest increment a digital register can represent, used as the unit for how a raw sensor reading scales to a physical quantity.],
+    ),
 )
 
 // Hints:
