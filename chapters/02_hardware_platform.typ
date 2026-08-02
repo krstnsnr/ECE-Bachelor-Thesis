@@ -96,8 +96,60 @@ uses to reflash the car over WiFi, without setting aside any of the
 == Sensor Suite <sec:sensors>
 
 === Time-of-Flight Distance Sensors (VL53L1X) <sec:tof>
-// I2C addressing scheme
-// cite @VL53L1X2024 for sensor specs, I2C protocol, and ranging performance
+
+Each of the three distance sensors on the platform is an ST VL53L1X, a
+#gls("tof") laser-ranging module from ST's FlightSense family
+@VL53L1X2024. A conventional IR proximity sensor infers distance from the
+intensity of reflected infrared light. The VL53L1X instead times how long
+a 940nm laser pulse takes to travel to a target and back, using a
+#gls("spad") receiving array sensitive enough to register individual
+returning photons. That timing-based principle makes the reported
+distance largely independent of the target's color or reflectance, which
+matters on a track where the car has to range off wood barriers reliably.
+
+The module is a fully integrated LGA12 package measuring
+4.9 x 2.5 x 1.56mm, small enough to mount directly on the front and side
+edges of the chassis. It communicates over #gls("i2c") at up to 400kHz.
+It also exposes an active-low XSHUT pin for hardware shutdown and a
+GPIO1 interrupt output. This platform's firmware uses XSHUT to sequence
+startup when more than one sensor shares the bus (@sec:i2c-stack).
+
+Ranging behavior is controlled through three parameters. Distance mode
+selects between short, medium, and long range. It trades maximum
+distance against immunity to ambient light. In long mode the sensor
+reaches up to 3.6m in the dark, but only about 0.73m under strong
+ambient light. Short mode is largely unaffected by ambient light and
+tops out around 1.35m to 1.36m either way. Timing budget sets how long
+each measurement takes, from 20ms up to 1000ms. A longer budget extends
+maximum range and reduces the repeatability error of a reading, at the
+cost of a lower ranging rate. #gls("roi") lets the host restrict the
+active area of the sensor's 16x16 #glspl("spad") array down to as
+little as 4x4 #glspl("spad"). That narrows the sensor's diagonal
+#gls("fov") from a full 27 degrees to as little as 15 degrees.
+
+Every VL53L1X boots with the same fixed I2C address, 0x52 in the
+datasheet's 8-bit write convention. That is not a problem for a single
+sensor, but it conflicts as soon as more than one shares a bus. This
+platform puts three sensors, front, left, and right, on the same I2C
+bus, so all three would otherwise answer to that address at once. The
+datasheet's XSHUT pin resolves this. Holding it low puts a module into
+hardware standby with no I2C activity, so each sensor can be woken and
+assigned a unique address in turn while the others stay held down. This
+platform's firmware wires its own XSHUT line to each sensor and steps
+through them one at a time at startup, reassigning each to its own
+address before the next is released (@sec:i2c-stack).
+
+The three sensors are not configured identically. The front sensor runs
+in long distance mode with a 33ms timing budget, the fastest budget the
+datasheet specifies as usable across every distance mode, including
+long. Its #gls("roi") is narrowed to 4x4 #glspl("spad"), keeping its
+#gls("fov") tight on whatever is ahead of the car. The left and right
+sensors run in short distance mode at the datasheet's fastest possible
+20ms timing budget. Their #gls("roi") is widened to 10x10
+#glspl("spad"), suited to picking up a wall or barrier close to the
+side of the car. Inter-measurement time is set equal to each sensor's
+timing budget, so every sensor starts its next measurement as soon as
+the previous one finishes.
 
 === IMU (BNO055) <sec:imu>
 // 9-axis orientation sensing

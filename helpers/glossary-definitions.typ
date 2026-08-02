@@ -76,6 +76,18 @@
     (
       key: "rom", short: "ROM", long: "Read-Only Memory", description: [Non-volatile memory that is not intended to be rewritten during normal operation, here used to hold the microcontroller's factory bootloader.],
     ),
+    (
+      key: "tof", short: "ToF", long: "Time-of-Flight", description: [A distance-measurement principle that derives range from the time a signal, here an infrared laser pulse, takes to travel to a target and back.],
+    ),
+    (
+      key: "spad", short: "SPAD", long: "Single Photon Avalanche Diode", description: [A photodetector sensitive enough to register individual returning photons, used to time the round trip of reflected laser light.],
+    ),
+    (
+      key: "roi", short: "ROI", long: "Region of Interest", description: [A configurable subset of a sensor's receiving array used for a measurement, letting the effective field of view be narrowed without changing the physical sensor.],
+    ),
+    (
+      key: "fov", short: "FoV", long: "Field of View", description: [The angular extent of the scene a sensor can observe.],
+    ),
 )
 
 // Hints:

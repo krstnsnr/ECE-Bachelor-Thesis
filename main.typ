@@ -54,13 +54,13 @@
 
 // DUMMY: forces every entry in the .bib file to render in the bibliography
 // for review purposes. Remove once real in-text @citations replace this.
-#hide[
-  @STM32CubeMX2026 @Skogestad2003 @Braunl2008
-  @SchoberDTEG @BretterkliebeSensorik @OkornDiererMayerES @SallokerRTEA
-  @BNO0552021 @UM3121_2025 @VL53L1X2024
-  @BTN9970LV2021 @ADS71282020 @TLE49462L2020
-  @LaesserXRayLegacy2023
-]
+//#hide[
+//  @STM32CubeMX2026 @Skogestad2003 @Braunl2008
+//  @SchoberDTEG @BretterkliebeSensorik @OkornDiererMayerES @SallokerRTEA
+//  @BNO0552021 @UM3121_2025 @VL53L1X2024
+//  @BTN9970LV2021 @ADS71282020 @TLE49462L2020
+//  @LaesserXRayLegacy2023
+//]
 
 #heading(numbering: none)[Bibliography]
 #bibliography("helpers/bib/ECEtempBib.bib", style: "ieee", title: none)

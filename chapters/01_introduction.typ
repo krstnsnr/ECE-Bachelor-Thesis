@@ -110,7 +110,7 @@ be used to tune and evaluate it reproducibly.
 The goals of this thesis are:
 
 - Implement drivers and integration for the platform's sensor and actuator
-  peripherals, including time-of-flight distance sensors, an inertial
+  peripherals, including #gls("tof") distance sensors, an inertial
   measurement unit, an external #gls("adc"), a Hall-effect speed sensor,
   and the motor and steering actuation hardware.
 - Provide a flag-based event mechanism in the firmware's state machine, so
