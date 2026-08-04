@@ -178,6 +178,12 @@ reports ready-to-use orientation data over #gls("i2c"). That leaves the
 STM32 free to run its control loop and state machine instead of a
 fusion filter of its own.
 
+#figure(
+  image("/assets/pictures/BNO055.png", width: 40%),
+  caption: [BNO055, 28-pin LGA package],
+) <fig:bno055>
+#align(center, text(size: 9pt, style: "italic")[Image source: @MouserBNO0552026])
+
 The BNO055 exposes both non-fusion modes, where individual sensors can
 be read raw, and fusion modes, where the on-chip algorithm combines
 them. This platform runs it in NDOF mode, the fusion mode that uses all
