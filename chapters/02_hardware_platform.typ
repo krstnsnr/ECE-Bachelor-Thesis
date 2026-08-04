@@ -280,9 +280,60 @@ analog routing back to the STM32's own ADC inputs.
 // limitations (no direction detection)
 // cite @TLE49462L2020 for switching thresholds and output characteristics
 
-== Actuation: Motor Drivers (BTN9970LV) <sec:motor-drivers>
-// half-bridge driving, current sensing
-// cite @BTN9970LV2021 for half-bridge specs, protection functions, and current sense
+== Motor Drivers (BTN9970LV) <sec:motor-drivers>
+
+The drive motor is switched by two Infineon BTN9970LV half-bridge
+drivers, part of Infineon's NovalithIC+ family @BTN9970LV2021. Each
+BTN9970LV packs a P-channel high-side #gls("mosfet"), an N-channel
+low-side #gls("mosfet"), and a driver IC into a single seven-pin
+package. Using a P-channel device on the high side removes the need
+for a charge pump, which keeps electromagnetic emissions down. The
+part is automotive-qualified, with a typical on-resistance of
+9.7mOhm, a supply range of 8V to 18V (40V absolute maximum), and a
+quiescent current under 3.3uA.
+
+#figure(
+  image("/assets/pictures/btn9970lv.jpg", width: 35%),
+  caption: [BTN9970LV, PG-HSOF-7 package],
+) <fig:btn9970lv>
+#align(center, text(size: 9pt, style: "italic")[Image source: @DigiKeyBTN9970LV2026])
+
+Each BTN9970LV takes two digital control inputs. IN selects which
+side of the bridge switches on, the high side or the low side, so the
+output pin tracks the state of the IN pin. INH is a separate enable
+input. When INH is low the device goes into tristate and both sides
+switch off, regardless of IN. The datasheet specifically notes that
+the output tracks IN fast enough to run it directly from a PWM
+signal.
+
+The datasheet states that two BTN9970LVs can be combined into an
+H-bridge, and this platform does exactly that, with one IC on each
+motor terminal. This platform's firmware sets each IC's IN pin to a
+fixed level for the duration of a direction. The two ICs get opposite
+levels, so one motor terminal is pulled high while the other is
+pulled low. A single shared PWM signal drives both ICs' INH pins
+together. Each PWM cycle enables both halves of the bridge for the
+high part of the duty cycle, then tristates both of them for the
+rest. The motor coasts briefly during every off interval instead of
+being actively braked. Setting both IN pins to the same level, or
+driving the shared INH permanently low, stops the motor.
+
+Each BTN9970LV also reports its high-side load current back over its
+IS pin as a small analog current. The datasheet gives the load
+current as IL = dkILIS x (IIS - IIS,offset), where dkILIS is a
+differential current sense ratio around 40000 and IIS,offset is a
+fixed offset current around 160uA, both typical values. This platform
+converts that current to a voltage across a 2kOhm sense resistor and
+reads it on its own #gls("adc") channel per side (@sec:adc), giving
+the firmware an independent current reading for each motor terminal.
+
+Overcurrent, overtemperature, and undervoltage protection are built
+into the driver itself. An overcurrent event above a 60A minimum
+detection threshold, or the junction temperature exceeding its
+shutdown limit, latches both switches off until the fault is cleared.
+The supply voltage dropping below the undervoltage threshold shuts
+the device down the same way, until it recovers. None of this
+requires firmware support to function.
 
 == Wireless Bridge: ESP8266 (D1 mini) <sec:esp-bridge>
 

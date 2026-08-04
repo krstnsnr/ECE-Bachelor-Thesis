@@ -94,6 +94,9 @@
     (
       key: "sar", short: "SAR", long: "Successive Approximation Register", description: [An ADC architecture that resolves each output bit in turn through a binary search against a comparator, one bit per conversion step.],
     ),
+    (
+      key: "mosfet", short: "MOSFET", long: "Metal-Oxide-Semiconductor Field-Effect Transistor", description: [A voltage-controlled transistor commonly used as an electronic switch in power and driver circuits.],
+    ),
 )
 
 // Hints:
