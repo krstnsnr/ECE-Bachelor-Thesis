@@ -32,14 +32,22 @@ matters when a fleet of these cars is driven by students.
 ) <fig:chassis>
 #align(center, text(size: 9pt, style: "italic")[Image source: @MKRacingXRAYM18Pro2026])
 
-== Main PCB (Pre-Existing Design) <sec:main-pcb>
-// functional overview
-// cite @LaesserXRayLegacy2023 for the PCB schematics/layout (XRay Legacy V1)
-// designed by A. Lasser specifically for this STM32 generation, but never
-// built up or tested before this thesis; frame the bring-up as this
-// thesis's own work, not something inherited/carried over from a prior gen
+== Main PCB (XRay Legacy V1) <sec:main-pcb>
 
+Everything in this chapter bolts onto one custom #gls("pcb"), designed
+in-house by A. Läßer specifically for this STM32-based generation of
+CrazyCar @LaesserXRayLegacy2023. It is the board that ties the rest of
+the platform together. The #gls("i2c") sensor stack, the motor and
+steering drivers, the ADC, and the #gls("esp") WiFi bridge all mount
+to it, alongside the Nucleo board carrying the STM32H533RE itself.
+This thesis's firmware runs on that PCB, and this thesis is also the
+first to bring the board up and evaluate it (@sec:pcb-impact-summary).
 
+#figure(
+  image("/assets/pictures/XRayLegacy_PCB_TopView.png", width: 70%),
+  caption: [XRay Legacy V1 PCB, top view],
+) <fig:main-pcb>
+#align(center, text(size: 9pt, style: "italic")[Image source: @LaesserXRayLegacy2023])
 
 == Microcontroller: STM32H533RE (Nucleo-H533RE) <sec:mcu>
 
@@ -65,13 +73,13 @@ headroom for the firmware to grow over the course of the thesis instead
 of running into a memory wall.
 
 In the 64-pin #gls("lqfp") package used on this board, the STM32H533RE
-exposes three #gls("i2c") interfaces, four #gls("spi") interfaces, six
+exposes three I2C interfaces, four #gls("spi") interfaces, six
 #gls("usart") and #gls("uart") instances, two 12-bit #glspl("adc"), and a
 wide set of general-purpose and #gls("pwm")-capable timers
 @STM32H533xx2026. That peripheral count fits this platform directly. The
-#gls("i2c") buses are enough to host the ADS7128 #gls("adc"), the BNO055
+I2C buses are enough to host the ADS7128 #gls("adc"), the BNO055
 #gls("imu"), and the VL53L1X distance sensors (@sec:i2c-stack), a
-#gls("usart") carries the #gls("esp") WiFi bridge traffic, and the
+#gls("usart") carries the ESP8266 WiFi bridge traffic, and the
 #gls("pwm") timers drive the motor and steering actuators
 (@sec:actuator-control).
 
@@ -365,14 +373,3 @@ writes bytes to the USART and reads bytes back over #gls("dma"), with
 no awareness of what the ESP8266 does with them beyond that. The
 ESP8266's own firmware, which handles the WiFi connection and frame
 routing, is not part of this thesis.
-
-== PCB Design Evaluation <sec:pcb-evaluation>
-
-=== Findings <sec:pcb-findings>
-- Battery charging circuit unsuitable for LiIon/LiPo
-- SDA/SCL swap needed for BNO055
-- Missing ESP8266-12F on-board
-- STM32 pin layout issue
-- Missing pulldown on #gls("esc") INH pin
-
-=== Recommendations for the Next PCB Revision <sec:pcb-recommendations>

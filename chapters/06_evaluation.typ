@@ -13,3 +13,12 @@
 // time-to-tune, workflow improvements vs. previous approach
 
 == Summary of PCB Oversight Impact on Testing <sec:pcb-impact-summary>
+
+=== Findings <sec:pcb-findings>
+- Battery charging circuit unsuitable for LiIon/LiPo
+- SDA/SCL swap needed for BNO055
+- Missing ESP8266-12F on-board
+- STM32 pin layout issue
+- Missing pulldown on ESC INH pin
+
+=== Recommendations for the Next PCB Revision <sec:pcb-recommendations>
