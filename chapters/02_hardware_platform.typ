@@ -366,13 +366,22 @@ requires firmware support to function.
 
 == ESP8266 (D1 mini) <sec:esp-bridge>
 
-The platform's only wireless link is a WeMos D1 mini, a small
-ESP8266EX-based module with built-in WiFi, 4MB of flash, and a
-micro-USB connector used for both power and programming
-@EnvistiaD1Mini2020. On this platform it does one job. It sits
-on the USART between the STM32 and the AI-MotionLab testsuite
-(@sec:mcu), moving telemetry and #gls("ota") update traffic over WiFi
-that would otherwise need a wired connection to the car.
+The platform's only wireless link is an AZ-Delivery D1 mini, a small
+board built around an ESP8266MOD-12F WiFi module, with 4MB of flash
+and a micro-USB connector used for both power and programming
+@AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor
+and pinout as the original WeMos design, but this platform uses
+AZ-Delivery's own board, not a genuine WeMos part. On this platform it
+does one job. It sits on the USART between the STM32 and the
+AI-MotionLab testsuite (@sec:mcu), moving telemetry and #gls("ota")
+update traffic over WiFi that would otherwise need a wired connection
+to the car.
+
+#figure(
+  image("/assets/pictures/D1_Mini_TopDown.jpg", width: 40%),
+  caption: [AZ-Delivery D1 mini, top-down view],
+) <fig:d1-mini>
+#align(center, text(size: 9pt, style: "italic")[Image source: @AZDeliveryD1Mini2026])
 
 This platform's firmware treats that link as a plain byte pipe. It
 writes bytes to the USART and reads bytes back over #gls("dma"), with
