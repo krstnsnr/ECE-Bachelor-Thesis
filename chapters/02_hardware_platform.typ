@@ -277,8 +277,23 @@ bus as the rest of the sensor stack, instead of requiring dedicated
 analog routing back to the STM32's own ADC inputs.
 
 === Hall-Effect Speed Sensor (TLE4966L) <sec:hall>
-// limitations (no direction detection)
-// cite @TLE4966L2020 for switching thresholds and output characteristics
+
+Wheel speed is measured with an Infineon TLE4966L, a dual Hall-effect
+IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. It sits next to a
+ring of alternating magnetic poles on the wheel and outputs one speed
+pulse per pole pair as the wheel turns.
+
+#figure(
+  image("/assets/pictures/TLE4966L.png", width: 25%),
+  caption: [TLE4966L, PG-SSO-4-1 package],
+) <fig:tle4966l>
+#align(center, text(size: 9pt, style: "italic")[Image source: @InfineonTLE4966LProductPage2026])
+
+What sets the TLE4966L apart from a plain Hall switch is a second
+output pin that reports rotation direction alongside the speed pulse.
+A plain switch can only say how fast a wheel is turning, not which
+way. This platform uses the TLE4966L for that second signal, because
+telling forward from reverse matters for the speed controller.
 
 == Motor Drivers (BTN9970LV) <sec:motor-drivers>
 

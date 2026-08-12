@@ -58,7 +58,7 @@
 //  @STM32CubeMX2026 @Skogestad2003 @Braunl2008
 //  @SchoberDTEG @BretterkliebeSensorik @OkornDiererMayerES @SallokerRTEA
 //  @BNO0552021 @UM3121_2025 @VL53L1X2024
-//  @BTN9970LV2021 @ADS71282020 @TLE49462L2020
+//  @BTN9970LV2021 @ADS71282020 @TLE4966L2020
 //  @LaesserXRayLegacy2023
 //]
 
