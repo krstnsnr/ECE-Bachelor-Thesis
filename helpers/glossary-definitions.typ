@@ -97,6 +97,9 @@
     (
       key: "mosfet", short: "MOSFET", long: "Metal-Oxide-Semiconductor Field-Effect Transistor", description: [A voltage-controlled transistor commonly used as an electronic switch in power and driver circuits.],
     ),
+    (
+      key: "dma", short: "DMA", long: "Direct Memory Access", description: [A peripheral that moves data between memory and other peripherals without the CPU copying it byte by byte.],
+    ),
 )
 
 // Hints:

@@ -71,7 +71,7 @@ wide set of general-purpose and #gls("pwm")-capable timers
 @STM32H533xx2026. That peripheral count fits this platform directly. The
 #gls("i2c") buses are enough to host the ADS7128 #gls("adc"), the BNO055
 #gls("imu"), and the VL53L1X distance sensors (@sec:i2c-stack), a
-#gls("usart") carries the ESP8266 WiFi bridge traffic, and the
+#gls("usart") carries the #gls("esp") WiFi bridge traffic, and the
 #gls("pwm") timers drive the motor and steering actuators
 (@sec:actuator-control).
 
@@ -276,9 +276,9 @@ these three signals through the ADS7128 keeps them on the same I2C
 bus as the rest of the sensor stack, instead of requiring dedicated
 analog routing back to the STM32's own ADC inputs.
 
-=== Hall-Effect Speed Sensor (TLE4946-2L) <sec:hall>
+=== Hall-Effect Speed Sensor (TLE4966L) <sec:hall>
 // limitations (no direction detection)
-// cite @TLE49462L2020 for switching thresholds and output characteristics
+// cite @TLE4966L2020 for switching thresholds and output characteristics
 
 == Motor Drivers (BTN9970LV) <sec:motor-drivers>
 
@@ -335,7 +335,21 @@ The supply voltage dropping below the undervoltage threshold shuts
 the device down the same way, until it recovers. None of this
 requires firmware support to function.
 
-== Wireless Bridge: ESP8266 (D1 mini) <sec:esp-bridge>
+== ESP8266 (D1 mini) <sec:esp-bridge>
+
+The platform's only wireless link is a WeMos D1 mini, a small
+ESP8266EX-based module with built-in WiFi, 4MB of flash, and a
+micro-USB connector used for both power and programming
+@EnvistiaD1Mini2020. On this platform it does one job. It sits
+on the USART between the STM32 and the AI-MotionLab testsuite
+(@sec:mcu), moving telemetry and #gls("ota") update traffic over WiFi
+that would otherwise need a wired connection to the car.
+
+This platform's firmware treats that link as a plain byte pipe. It
+writes bytes to the USART and reads bytes back over #gls("dma"), with
+no awareness of what the ESP8266 does with them beyond that. The
+ESP8266's own firmware, which handles the WiFi connection and frame
+routing, is not part of this thesis.
 
 == PCB Design Evaluation <sec:pcb-evaluation>
 
