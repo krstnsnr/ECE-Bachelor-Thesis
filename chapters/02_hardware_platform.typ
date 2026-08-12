@@ -300,7 +300,7 @@ quiescent current under 3.3uA.
   image("/assets/pictures/btn9970lv.jpg", width: 45%),
   caption: [BTN9970LV, PG-HSOF-7 package],
 ) <fig:btn9970lv>
-#align(center, text(size: 9pt, style: "italic")[Image source: @DigiKeyBTN9970LV2026])
+#align(center, text(size: 9pt, style: "italic")[Image source: @Rutronik24BTN9970LV2026])
 
 Each BTN9970LV takes two digital control inputs. IN selects which
 side of the bridge switches on, the high side or the low side, so the
@@ -325,8 +325,7 @@ reads that current independently for each motor terminal, one
 #gls("adc") channel per side (@sec:adc-handling).
 
 Overcurrent, overtemperature, and undervoltage protection are built
-into the driver itself. An overcurrent event above a 60A minimum
-detection threshold, or the junction temperature exceeding its
+into the driver itself. An overcurrent event or the junction temperature exceeding its
 shutdown limit, latches both switches off until the fault is cleared.
 The supply voltage dropping below the undervoltage threshold shuts
 the device down the same way, until it recovers. None of this
