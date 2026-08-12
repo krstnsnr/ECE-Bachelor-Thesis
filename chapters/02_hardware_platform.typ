@@ -241,10 +241,12 @@ The platform's external ADC is a Texas Instruments ADS7128, an
 WQFN package @ADS71282020. Each of its eight channels can be
 independently configured as an analog input, a digital input, or a
 GPIO output, and an internal oscillator drives the conversion process,
-so the device needs no clock from the host. It sits on the same I2C
-bus as the rest of the sensor stack (@sec:i2c-stack), giving the
-firmware extra analog channels without using any of the STM32's own
-ADC pins.
+so the device needs no clock from the host. The STM32H533RE has only 
+two internal ADCs of its
+own (@sec:mcu), while the ADS7128 sits on the same I2C bus as the
+rest of the sensor stack (@sec:i2c-stack) and adds eight more channels
+without using any of the microcontroller's own ADC pins, more
+headroom than this platform ends up needing.
 
 #figure(
   image("/assets/pictures/ads7128.png", width: 50%),
@@ -252,37 +254,12 @@ ADC pins.
 ) <fig:ads7128>
 #align(center, text(size: 9pt, style: "italic")[Image source: @TIADS7128ProductPage2026])
 
-The ADS7128 answers to one of eight I2C addresses, selected by two
-external resistors on its ADDR pin rather than a single logic-level
-pin. This platform ties one of those resistors to 100kOhm and leaves
-the other unpopulated. The datasheet's address table maps that
-combination to 0x10. All register access goes through a two-byte
-command, an opcode followed by a register address. This platform's
-driver uses only two of the opcodes the datasheet defines, 0x08 for a
-single register write and 0x10 for a single register read. A finished
-12-bit conversion result is read back MSB-justified across two bytes,
-the upper eight bits followed by the lower four bits padded with
-zeros. The driver reassembles the two bytes into a single 12-bit value
-with a shift and a combine.
-
-The device powers up in manual mode, and this platform leaves it
-there instead of switching to auto-sequence or autonomous mode. In
-manual mode the host selects a channel with a register write, instead
-of toggling the multiplexer directly. This platform's driver writes
-the desired channel to the CHANNEL_SEL register before every
-conversion, and enables 32x oversampling through the OSR_CFG register,
-the datasheet's built-in averaging filter, for extra settling time and
-noise reduction. After switching to a new channel, the driver reads it
-twice and discards the first conversion. That way a stale sample left
-over from the previous channel is never mistaken for a valid reading.
-
-This platform uses three of the eight channels. One reads the
-battery voltage through a 10kOhm/18kOhm divider. The other two read
-the negative and positive-side current-sense outputs of the
-BTN9970LV half-bridge motor drivers (@sec:motor-drivers). Routing
-these three signals through the ADS7128 keeps them on the same I2C
-bus as the rest of the sensor stack, instead of requiring dedicated
-analog routing back to the STM32's own ADC inputs.
+The ADS7128 answers to one of eight I2C addresses, selected by a pair
+of external resistors on its ADDR pin rather than a single
+logic-level pin, letting more than one ADS7128 share a bus if a
+design ever needs it. How this platform's firmware drives the device
+and which of its eight channels it actually uses is covered in
+@sec:adc-handling.
 
 === Hall-Effect Speed Sensor (TLE4966L) <sec:hall>
 
@@ -352,9 +329,8 @@ IS pin as a small analog current. The datasheet gives the load
 current as IL = dkILIS x (IIS - IIS,offset), where dkILIS is a
 differential current sense ratio around 40000 and IIS,offset is a
 fixed offset current around 160uA, both typical values. This platform
-converts that current to a voltage across a 2kOhm sense resistor and
-reads it on its own #gls("adc") channel per side (@sec:adc), giving
-the firmware an independent current reading for each motor terminal.
+reads that current independently for each motor terminal, one
+#gls("adc") channel per side (@sec:adc-handling).
 
 Overcurrent, overtemperature, and undervoltage protection are built
 into the driver itself. An overcurrent event above a 60A minimum

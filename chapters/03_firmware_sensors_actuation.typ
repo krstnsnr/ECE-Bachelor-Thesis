@@ -74,16 +74,52 @@ address (0x30, 0x32, 0x34) before the next is released. Only once all
 three have a unique address does ranging start on any of them.
 
 The ADC and IMU need no such dance. The ADS7128's address is set in
-hardware by a resistor on its ADDR pin (@sec:adc), and the BNO055's
-by the level on its COM3 pin (@sec:imu), so both are already unique
-by the time their init functions run, each just confirms the device
-answers where it is expected to.
+hardware by a resistor on its ADDR pin (@sec:adc), tied on this
+platform to give address 0x20, and the BNO055's by the level on its
+COM3 pin (@sec:imu). Both are already unique by the time their init
+functions run, so each just confirms the device answers where it is
+expected to.
 
 === ADC Channel Handling <sec:adc-handling>
-// ads7128
 
-=== ADC Channel Handling <sec:adc-handling>
-// ads7128
+All register access goes through a two-byte command, an operation code
+followed by a register address. This platform's driver uses only two
+of the opcodes the datasheet defines, one for a single register write
+and one for a single register read. A finished 12-bit conversion
+result is read back MSB-justified across two bytes, the upper eight
+bits followed by the lower four bits padded with zeros, and the
+driver reassembles the two into a single 12-bit value with a shift
+and a combine.
+
+The device powers up in manual mode, and this platform leaves it
+there instead of switching to auto-sequence or autonomous mode. In
+manual mode the host selects a channel with a register write instead
+of toggling the multiplexer directly, so this platform's driver
+writes the desired channel to the device's channel-select register
+before every conversion. It also enables 32x oversampling, the
+datasheet's built-in averaging filter, for extra settling time and
+noise reduction. After switching to a new channel, the driver reads
+it twice and discards the first conversion, so a stale sample left
+over from the previous channel is never mistaken for a valid one.
+
+This platform uses three of the eight channels. One reads the
+battery voltage through a 10kOhm/18kOhm divider. The other two read
+the negative and positive-side current-sense outputs of the
+BTN9970LV half-bridge motor drivers (@sec:motor-drivers), each
+converted from the driver's IS pin current to a voltage across a
+2kOhm sense resistor before the ADC channel sees it.
+
+None of that raw handling reaches the rest of the firmware. On top
+of the channel-select and read functions, the driver exposes two
+purpose-built getters, `ADS7128_GetBatteryVoltage()` and
+`ADS7128_GetCurrent()`, each of which reads its channel, waits for a
+settled sample, and converts the result into a physical unit itself,
+volts for the battery and amps for motor current, using the divider
+and current-sense math already covered in @sec:motor-drivers.
+`control_loop.c` never touches a raw ADC code. It just calls the
+getter for whichever channel it needs, at the rates already shown in
+@fig:system-diagram, and writes the returned value straight into the
+matching telemetry global.
 
 == Actuator Control <sec:actuator-control>
 // motor_control, servo_steering, pid, control_loop
