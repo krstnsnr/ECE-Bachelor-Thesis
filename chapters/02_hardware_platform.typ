@@ -292,10 +292,16 @@ ring of alternating magnetic poles on the wheel and outputs one speed
 pulse per pole pair as the wheel turns.
 
 #figure(
-  image("/assets/pictures/TLE4966L.png", width: 25%),
-  caption: [TLE4966L, PG-SSO-4-1 package],
+  grid(
+    columns: (1fr, 1fr),
+    column-gutter: 1em,
+    align: horizon,
+    image("/assets/pictures/TLE4966L.png", width: 55%),
+    image("/assets/pictures/RPM_Sensor_V2.0_Board.png", width: 65%),
+  ),
+  caption: [TLE4966L, PG-SSO-4-1 package, and this platform's RPM sensor board carrying it],
 ) <fig:tle4966l>
-#align(center, text(size: 9pt, style: "italic")[Image source: @InfineonTLE4966LProductPage2026])
+#align(center, text(size: 9pt, style: "italic")[Image sources: TLE4966L photo, @InfineonTLE4966LProductPage2026; RPM sensor board, @KrennRPMSensor2026])
 
 What sets the TLE4966L apart from a plain Hall switch is a second
 output pin that reports rotation direction alongside the speed pulse.
