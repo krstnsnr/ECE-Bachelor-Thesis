@@ -53,9 +53,34 @@ reads and writes that shared data, never talking to a driver or an
 actuator directly.
 
 == Sensor Drivers and Data Acquisition <sec:sensor-drivers>
-
 === I2C Sensor Stack Integration and Address Assignment at Startup <sec:i2c-stack>
-// ads7128, bno055, tof_sensor addressing
+
+Five I2C devices, three ToF sensors, the ADC, and the IMU, share the
+STM32's single I2C1 bus (@sec:mcu). Each has to be reachable at its
+own address before its driver can be used. @fig:i2c-startup shows the
+order this happens in during boot and the address each device ends up
+at.
+
+#figure(
+  image("/assets/graphics/selfdrawn/i2c_startup_sequence.svg", width: 75%),
+  caption: [I2C1 startup sequence and address assignment],
+) <fig:i2c-startup>
+
+The three ToF sensors are the reason this has to be a sequence at
+all. Every VL53L1X boots at the same fixed address (@sec:tof), so
+this platform's firmware holds all three in hardware standby and
+brings them up one at a time, each getting reassigned to its own 8-bit
+address (0x30, 0x32, 0x34) before the next is released. Only once all
+three have a unique address does ranging start on any of them.
+
+The ADC and IMU need no such dance. The ADS7128's address is set in
+hardware by a resistor on its ADDR pin (@sec:adc), and the BNO055's
+by the level on its COM3 pin (@sec:imu), so both are already unique
+by the time their init functions run, each just confirms the device
+answers where it is expected to.
+
+=== ADC Channel Handling <sec:adc-handling>
+// ads7128
 
 === ADC Channel Handling <sec:adc-handling>
 // ads7128
