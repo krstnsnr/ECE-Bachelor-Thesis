@@ -292,14 +292,12 @@ The drive motor is switched by two Infineon BTN9970LV half-bridge
 drivers, part of Infineon's NovalithIC+ family @BTN9970LV2021. Each
 BTN9970LV packs a P-channel high-side #gls("mosfet"), an N-channel
 low-side #gls("mosfet"), and a driver IC into a single seven-pin
-package. Using a P-channel device on the high side removes the need
-for a charge pump, which keeps electromagnetic emissions down. The
-part is automotive-qualified, with a typical on-resistance of
+package. The part is automotive-qualified, with a typical on-resistance of
 9.7mOhm, a supply range of 8V to 18V (40V absolute maximum), and a
 quiescent current under 3.3uA.
 
 #figure(
-  image("/assets/pictures/btn9970lv.jpg", width: 35%),
+  image("/assets/pictures/btn9970lv.jpg", width: 45%),
   caption: [BTN9970LV, PG-HSOF-7 package],
 ) <fig:btn9970lv>
 #align(center, text(size: 9pt, style: "italic")[Image source: @DigiKeyBTN9970LV2026])
@@ -314,15 +312,9 @@ signal.
 
 The datasheet states that two BTN9970LVs can be combined into an
 H-bridge, and this platform does exactly that, with one IC on each
-motor terminal. This platform's firmware sets each IC's IN pin to a
-fixed level for the duration of a direction. The two ICs get opposite
-levels, so one motor terminal is pulled high while the other is
-pulled low. A single shared PWM signal drives both ICs' INH pins
-together. Each PWM cycle enables both halves of the bridge for the
-high part of the duty cycle, then tristates both of them for the
-rest. The motor coasts briefly during every off interval instead of
-being actively braked. Setting both IN pins to the same level, or
-driving the shared INH permanently low, stops the motor.
+motor terminal. How this platform's firmware actually drives the two
+ICs to get a direction and a speed out of that pair is covered in
+@sec:actuator-control.
 
 Each BTN9970LV also reports its high-side load current back over its
 IS pin as a small analog current. The datasheet gives the load

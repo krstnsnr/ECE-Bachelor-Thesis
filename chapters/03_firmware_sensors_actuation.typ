@@ -122,8 +122,54 @@ getter for whichever channel it needs, at the rates already shown in
 matching telemetry global.
 
 == Actuator Control <sec:actuator-control>
-// motor_control, servo_steering, pid, control_loop
-// cite @Skogestad2003 where you justify the PID tuning method used
 
-// Extended Logging (distance sensor data, actual vs. set speed, IMU data)
-// mention here if implemented as part of control_loop / telemetry_fields
+Both the steering and speed PID controllers that the state machine
+drives each 100Hz tick (@sec:app-structure) share one implementation.
+A `PID_t` instance holds its own gains, an accumulated integral term,
+and the previous error, alongside output limits. Each call first
+computes the error as setpoint minus measurement. It then computes a
+proportional term from that error, an integral term accumulated over
+time and clamped to a fixed fraction of the output range before
+being scaled by the integral gain, and a derivative term from the
+change in error since the last call. The three terms are summed and
+the result is clamped to the controller's output range before it is
+returned. This is a standard parallel-form PID controller
+@SallokerRTEA. The clamped integral keeps it
+from winding up while the output is saturated, and the final output
+clamp keeps that saturated output within a range the actuator
+underneath it can actually use.
+
+Starting gains for both controllers came from Skogestad's SIMC
+tuning rules @Skogestad2003, applied to step-response data captured
+on the platform itself. The resulting gains are stored as
+plain writable telemetry fields.
+`state_machine.c` reloads them into its PID instances at the start
+of every tick, so a gain written from the AI-MotionLab testsuite
+over the OTA link takes effect on the next control step, without a
+rebuild or a reflash. The gains in the firmware today reflect that
+live tuning on top of the original SIMC starting point.
+
+The speed PID's output drives the motor through `Motor_SetSpeed()`.
+The two BTN9970LV half-bridges that make up the drive motor's
+H-bridge (@sec:motor-drivers) each take an IN pin, which selects
+which side of that half-bridge switches on, and an INH pin, which
+enables it or tristates it entirely. This platform sets each IC's IN
+pin to a fixed level for the duration of a direction, IN1 high for
+forward and IN2 high for reverse, with the two ICs always getting
+opposite levels so one motor terminal is pulled high while the other
+is pulled low. A single shared PWM signal drives both ICs' INH pins
+together, and its duty cycle comes directly from the PID output's
+magnitude. Every cycle enables both halves of the bridge for the
+high part of that duty cycle, then tristates both of them for the
+rest, so the motor coasts briefly during every off interval instead
+of being actively braked. Setting both IN pins to the same level, or
+holding the shared INH low, stops the motor.
+
+The steering PID's output goes through a calibration step
+instead of a direct mapping. `Set_Steering()` takes a command in the
+range -100 to 100, clamps it to that range, and linearly interpolates
+between three measured pulse widths, 1200us at full left, 1480us at
+center, and 1800us at full right, rather than assuming a symmetric
+range around center. The result is clamped a second time, to a wider
+500us to 2500us hardware safety range, immediately before it is
+written to the timer register that drives the steering servo.
