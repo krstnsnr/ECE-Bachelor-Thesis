@@ -1,4 +1,4 @@
-= Firmware Design: State Machine and Turn Detection (STM32) <ch:firmware-state-machine>
+= Firmware Design: State Machine and Turn Detection <ch:firmware-state-machine>
 
 == State Machine Design <sec:state-machine>
 

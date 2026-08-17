@@ -1,6 +1,6 @@
 #import "/helpers/gls.typ": gls, glspl
 
-= Firmware Design: Sensors and Actuation (STM32) <ch:firmware-sensors>
+= Firmware Design: Sensors and Actuation <ch:firmware-sensors>
 
 == Application Structure Overview <sec:app-structure>
 
