@@ -89,15 +89,78 @@ value, so a sensor dropout does not look like a jump.
 
 === Alignment and Wall-Ahead Preconditions <sec:turn-preconditions>
 
+The slope test would also fire when the car drifts or turns fast on straights, since its own
+rotation moves the side readings. Four preconditions gate it, so it runs only
+when the car is tracking a straight and closing on a corner. @fig:turn-preconditions
+shows the two that give this section its name.
+
+The firmware keeps a slowly tracked estimate of the corridor heading, the
+direction of the lane the car is driving down. A low-pass filter follows the
+heading while the car runs straight and reseeds it after a prolonged rotation.
+The slope test is allowed only while the current heading stays within 20
+degrees of that corridor heading. A car that is already cornering or drifting
+then does not read its own rotation as an opening.
+
+#figure(
+  image("/assets/graphics/selfdrawn/turn_preconditions.svg", width: 65%),
+  caption: [Alignment and wall-ahead preconditions for the turn detector],
+) <fig:turn-preconditions>
+
+A second gate requires a wall ahead. The front distance must be under 2
+metres, so only a real corner counts, where the track also closes off ahead. Two further gates
+require a minimum forward speed, below which the distance-normalized slope is
+meaningless, and a yaw rate under a fixed limit, so a fast spin never passes.
+Only when all four hold is the side slope compared against its threshold.
+
 == Turn Completion Logic <sec:turn-completion>
 
 === Heading-Delta Tracking per Tick <sec:heading-delta>
 
+A turn ends when the car has rotated far enough, so the firmware needs to know
+how much it has turned since the corner began. On entering a turn state it
+records the current heading as a baseline and clears a signed accumulator.
+
+Every tick the car adds how far it has rotated since the previous tick to that
+accumulator. The step is the shortest signed difference between the current
+and previous heading, wrapped into the range from -180 to 180 degrees, which
+keeps each step correct across the point where the heading rolls over. A step
+larger than 30 degrees is discarded as an IMU glitch rather than added.
+Summing these small per-tick steps, instead of comparing against the start
+heading directly, lets the total pass beyond a half turn without the heading
+wrap corrupting it. The running total feeds the completion criteria in
+@sec:completion-criteria.
+
 === Completion Criteria <sec:completion-criteria>
-// 90 deg +/- 10 deg, front distance > 1.2 m
+
+The accumulated turn angle is checked against an exit grid, a small set of
+target angles a corner is expected to land on. The grid has two entries,
+90 degrees for a normal corner and 180 degrees for a hairpin, each with a
+tolerance of 10 degrees. A normal corner usually exits a little short of a square 90
+degrees, which lets the wall follower take over and finish straightening the
+car.
+
+A turn completes when two things hold together. The accumulated angle sits
+within tolerance of a grid target, and the front distance has opened past 1.2
+metres, so the car now looks down clear track rather than still facing the
+corner. For a normal corner this means the car has swung around by roughly 90
+degrees and the way ahead is open, as sketched in the completion figure. To
+reject a brief flicker, both conditions must hold for two consecutive ticks
+before the car leaves the turn state and returns to straight driving.
+
+#figure(
+  image("/assets/graphics/selfdrawn/turn_completion.svg", width: 60%),
+  caption: [Turn completion for a 90° corner, with the accumulated angle near its exit target and the track ahead now clear],
+) <fig:turn-completion>
 
 === Failsafe Exit Condition <sec:failsafe-exit>
-// 180 deg timeout
+
+The CrazyCar competition track is built only from 90-degree corners
+and 180-degree hairpins, and the exit grid mirrors this with one target near
+each. A 90-degree corner
+completes near its target once the front opens. A turn that does not complete
+as a 90-degree corner can only be a hairpin, so the car exits once it has
+turned a full 180 degrees, whether or not the front has opened by then. This
+bounds every turn at half a rotation and guarantees the turn state always ends.
 
 // Remaining open item from the old "Future Work" chapter:
 // remote-control state (CAR_REMOTE_CONTROL) already implemented -- describe
