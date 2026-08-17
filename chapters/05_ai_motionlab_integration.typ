@@ -4,8 +4,30 @@
 // exposes (GET/SET, telemetry fields) that the testsuite consumes -- with
 // the GUI/testsuite described only as much as needed for context.
 
+The firmware is built to be observed and tuned from outside the car. It exposes
+its telemetry and parameters through a small text protocol carried over the
+WiFi bridge, and it accepts new firmware images the same way. On the other end
+sits the AI-MotionLab testsuite, a desktop application that a colleague,
+Benedikt Polivka, developed alongside this firmware @PolivkaTestsuite2026. This
+chapter describes the integration from the car side. It covers what the STM32
+exposes and how the testsuite uses it, and describes the testsuite itself only
+as far as that context needs.
+
 == Testsuite Architecture Overview <sec:testsuite-architecture>
-// dock-based PySide app, relevant modules only
+
+The testsuite is a dock-based PySide desktop application. Each panel is a dock
+that can be shown, hidden, or rearranged, and each owns one job. A live map
+draws the track and the cars on it, a parameters panel reads and writes the
+car's tuning fields, a sensors panel shows incoming telemetry, and a messaging
+panel exchanges raw commands with the car. Lap timing, event detection, and
+session logging run alongside these.
+
+Only a few of these panels reach the firmware directly, and they all speak the
+same text protocol over the WiFi bridge. The rest of this chapter follows that
+protocol from the car side. The parts of the testsuite that consume it, the
+graphing, logging, and lap timing, are Polivka's work @PolivkaTestsuite2026 and
+appear here only to show what the firmware's telemetry and parameter fields are
+used for.
 
 == Car Communication Module <sec:car-comm-module>
 // bridging car_ota.py into the GUI
