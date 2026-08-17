@@ -16,7 +16,7 @@ The third-semester "Embedded Systems" lecture uses that same CrazyCar as
 its lab vehicle. Students build a layered (#gls("hal"), #gls("dl"),
 #gls("al")) firmware stack for it on an MSP430F5335 microcontroller as a
 single-semester lab exercise. It covers #gls("gpio"), timers, #gls("pwm"),
-#gls("spi") and a distance-sensor driver as well as a first driving state
+#gls("i2c") and a distance-sensor driver as well as a first driving state
 machine with #gls("pid") control @OkornDiererMayerES. That
 generation of the platform was built to teach embedded systems fundamentals
 within one semester. Within that scope, the application layer, the state

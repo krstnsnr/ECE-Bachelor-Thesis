@@ -44,7 +44,9 @@ telemetry each 100Hz tick and drives two
 PID controllers, one for motor speed and one for steering,
 which in turn set the ESC and servo outputs, covered in @sec:actuator-control.
 
-Splitting the firmware this way keeps each module narrow. Sensor
+Splitting the firmware this way keeps each module narrow and follows the
+sensor, controller, and actuator layering common to embedded robotics
+platforms @Braunl2008. Sensor
 drivers, described in @sec:sensor-drivers, only know how to talk to their own chip.
 The telemetry globals are just data, readable and writable by name so
 the OTA link can expose them to the AI-MotionLab testsuite without

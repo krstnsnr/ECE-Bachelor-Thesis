@@ -38,7 +38,7 @@ Everything in this chapter bolts onto one custom #gls("pcb"), designed
 in-house by A. Läßer specifically for this STM32-based generation of
 CrazyCar @LaesserXRayLegacy2023. It is the board that ties the rest of
 the platform together. The #gls("i2c") sensor stack, the motor and
-steering drivers, the ADC, and the #gls("esp") WiFi bridge all mount
+steering drivers, the ADC, and the ESP8266 WiFi bridge all mount
 to it, alongside the Nucleo board carrying the STM32H533RE itself.
 This thesis's firmware runs on that PCB, and this thesis is also the
 first to bring the board up and evaluate it. @sec:pcb-impact-summary
@@ -55,8 +55,8 @@ reports the oversights that surfaced during that evaluation.
 This thesis's firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
 development board carrying an STM32H533RET6 microcontroller
 @UM3121_2025. That microcontroller choice came with the #gls("pcb")
-introduced in @sec:main-pcb. What follows is why it turned out
-to be a good fit for the firmware built on top of it.
+introduced in @sec:main-pcb, and it turned out to be a good fit for the
+firmware built on top of it.
 
 #figure(
   image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 70%),
@@ -64,39 +64,21 @@ to be a good fit for the firmware built on top of it.
 ) <fig:nucleo-board>
 #align(center, text(size: 9pt, style: "italic")[Image source: @UM3121_2025])
 
-The STM32H533RE is built around an Arm Cortex-M33 core with #gls("trustzone")
-and a hardware #gls("fpu"), clocked at up to 250 MHz @STM32H533xx2026. 
-It has 512 Kbytes of dual-bank flash and
-272 Kbytes of #gls("sram"). That is more of both than this project's
-sensor drivers, control loop, state machine, and telemetry stack need on
-their own, which leaves
-headroom for the firmware to grow over the course of the thesis instead
-of running into a memory wall.
+The STM32H533RE is built around an Arm Cortex-M33 core with a hardware
+#gls("fpu"), clocked at up to 250 MHz @STM32H533xx2026. It has 512 Kbytes of
+flash and 272 Kbytes of #gls("sram"), more than this project's sensor drivers,
+control loop, state machine, and telemetry stack need, which leaves headroom
+for the firmware to grow. Its peripheral set fits the platform directly. The
+I2C buses host the ADS7128 #gls("adc"), the BNO055 #gls("imu"), and the
+VL53L1X distance sensors, a #gls("usart") carries the ESP8266 WiFi bridge
+traffic, and the #gls("pwm") timers drive the motor and steering actuators.
+The firmware side of both is covered in @sec:i2c-stack and
+@sec:actuator-control.
 
-In the 64-pin #gls("lqfp") package used on this board, the STM32H533RE
-exposes three I2C interfaces, four #gls("spi") interfaces, six
-#gls("usart") and #gls("uart") instances, two 12-bit #glspl("adc"), and a
-wide set of general-purpose and #gls("pwm")-capable timers
-@STM32H533xx2026. That peripheral count fits this platform directly. The
-I2C buses are enough to host the ADS7128 #gls("adc"), the BNO055
-#gls("imu"), and the VL53L1X distance sensors, a
-#gls("usart") carries the ESP8266 WiFi bridge traffic, and the
-#gls("pwm") timers drive the motor and steering actuators. The firmware
-side of both, address assignment and actuator control, is covered in
-@sec:i2c-stack and @sec:actuator-control.
-
-The Nucleo-64 board wraps that microcontroller with everything needed to
-start developing right away. An on-board STLINK-V3EC debugger and
-programmer removes the need for a separate probe. Arduino Uno V3 and ST
-morpho headers expose all of the STM32's I/O for breakout wiring during
-bring-up. ST's free STM32CubeMX and STM32CubeIDE toolchain generates
-peripheral initialization code straight from a pin and clock
-configuration @STM32CubeMX2026. A capable microcontroller on a
-development board built for fast iteration follows the same
-sensor-plus-actuator-plus-microcontroller architecture already
-established for embedded robotics platforms @Braunl2008. This particular
-pairing also leaves enough headroom for this thesis's tuning and
-telemetry workflow.
+The Nucleo-64 board adds what is needed to develop right away, an on-board
+STLINK-V3EC debugger and programmer, headers that expose the STM32's I/O for
+bring-up wiring, and ST's STM32CubeMX and STM32CubeIDE toolchain for generating
+peripheral initialization code @STM32CubeMX2026.
 
 One STM32H5 feature matters beyond raw specs. The series includes a
 #gls("rom") system memory bootloader that this thesis's over-the-air update path
@@ -129,52 +111,23 @@ matters on a track where the car has to range off wood barriers reliably.
 ) <fig:tof-sensor>
 #align(center, text(size: 9pt, style: "italic")[Image source: @PimoroniVL53L1XBreakout2026])
 
-The bare VL53L1X is a fully integrated LGA12 package measuring
-4.9 x 2.5 x 1.56mm. On this platform each of the three sensors sits on
-a Pimoroni breakout board, shown in @fig:tof-sensor, which brings the module's
-pins out to a row of solder pads. The breakout is still small enough
-to mount on the chassis. It
-communicates over #gls("i2c") at up to 400kHz. It also exposes an
-active-low XSHUT pin for hardware shutdown and a GPIO1 interrupt
-output. This platform's firmware uses XSHUT to sequence startup when
-more than one sensor shares the bus, as @sec:i2c-stack describes.
+Each of the three sensors sits on a Pimoroni breakout board, shown in
+@fig:tof-sensor, and talks over #gls("i2c") at up to 400kHz. Every VL53L1X
+boots at the same fixed address, so the three cannot simply share one bus. Each sensor
+also has an active-low XSHUT pin that forces it into standby, and the firmware
+uses those pins to bring the sensors up one at a time and give each its own
+address at startup, a sequence @sec:i2c-stack walks through.
 
-Ranging behavior is controlled through three parameters. Distance mode
-selects between short, medium, and long range. It trades maximum
-distance against immunity to ambient light. In long mode the sensor
-reaches up to 3.6m in the dark, but only about 0.73m under strong
-ambient light. Short mode is largely unaffected by ambient light and
-tops out around 1.35m to 1.36m either way. Timing budget sets how long
-each measurement takes, from 20ms up to 1000ms. A longer budget extends
-maximum range and reduces the repeatability error of a reading, at the
-cost of a lower ranging rate. #gls("roi") lets the host restrict the
-active area of the sensor's 16x16 #glspl("spad") array down to as
-little as 4x4 #glspl("spad"). That narrows the sensor's diagonal
-#gls("fov") from a full 27 degrees to as little as 15 degrees.
-
-Every VL53L1X boots with the same fixed I2C address, 0x52 in the
-datasheet's 8-bit write convention. That is not a problem for a single
-sensor, but it conflicts as soon as more than one shares a bus. This
-platform puts three sensors, front, left, and right, on the same I2C
-bus, so all three would otherwise answer to that address at once. The
-datasheet's XSHUT pin resolves this. Holding it low puts a module into
-hardware standby with no I2C activity, so each sensor can be woken and
-assigned a unique address in turn while the others stay held down. This
-platform's firmware wires its own XSHUT line to each sensor and steps
-through them one at a time at startup, reassigning each to its own
-address before the next is released, a sequence @sec:i2c-stack walks through.
-
-The three sensors are not configured identically. The front sensor runs
-in long distance mode with a 33ms timing budget, the fastest budget the
-datasheet specifies as usable across every distance mode, including
-long. Its #gls("roi") is narrowed to 4x4 #glspl("spad"), keeping its
-#gls("fov") tight on whatever is ahead of the car. The left and right
-sensors run in short distance mode at the datasheet's fastest possible
-20ms timing budget. Their #gls("roi") is widened to 10x10
-#glspl("spad"), suited to picking up a wall or barrier close to the
-side of the car. Inter-measurement time is set equal to each sensor's
-timing budget, so every sensor starts its next measurement as soon as
-the previous one finishes.
+Ranging is tuned through three settings. The distance mode trades range against
+immunity to ambient light, reaching up to 3.6m in the dark in long mode but
+around 1.35m in short mode regardless of lighting. The timing budget sets how
+long a measurement takes, trading range and repeatability against ranging rate.
+The #gls("roi") restricts the active part of the 16x16 #gls("spad") array,
+which narrows the diagonal #gls("fov") from 27 degrees down to as little as 15.
+The three sensors use these differently. The front sensor runs in long mode
+with a narrow 4x4 #gls("roi") to keep its #gls("fov") tight on the track ahead,
+while the left and right sensors run in short mode with a wider 10x10
+#gls("roi") to pick up a nearby wall.
 
 === IMU (BNO055) <sec:imu>
 
@@ -263,7 +216,7 @@ design ever needs it. How this platform's firmware drives the device
 and which of its eight channels it actually uses is covered in
 @sec:adc-handling.
 
-=== Hall-Effect Speed Sensor (TLE4966L) <sec:hall>
+=== Wheel-speed Sensor (TLE4966L) <sec:hall>
 
 Wheel speed is measured with an Infineon TLE4966L, a dual Hall-effect
 IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. It sits next to a
@@ -291,12 +244,9 @@ telling forward from reverse matters for the speed controller.
 == Motor Drivers (BTN9970LV) <sec:motor-drivers>
 
 The drive motor is switched by two Infineon BTN9970LV half-bridge
-drivers, part of Infineon's NovalithIC+ family @BTN9970LV2021. Each
-BTN9970LV packs a P-channel high-side #gls("mosfet"), an N-channel
-low-side #gls("mosfet"), and a driver IC into a single seven-pin
-package. The part is automotive-qualified, with a typical on-resistance of
-9.7mOhm, a supply range of 8V to 18V (40V absolute maximum), and a
-quiescent current under 3.3uA.
+drivers from Infineon's NovalithIC+ family @BTN9970LV2021. Each
+integrates a high-side and a low-side #gls("mosfet") with a driver IC
+in one automotive-qualified package.
 
 #figure(
   image("/assets/pictures/btn9970lv.jpg", width: 45%),
@@ -304,36 +254,20 @@ quiescent current under 3.3uA.
 ) <fig:btn9970lv>
 #align(center, text(size: 9pt, style: "italic")[Image source: @Rutronik24BTN9970LV2026])
 
-Each BTN9970LV takes two digital control inputs. IN selects which
-side of the bridge switches on, the high side or the low side, so the
-output pin tracks the state of the IN pin. INH is a separate enable
-input. When INH is low the device goes into tristate and both sides
-switch off, regardless of IN. The datasheet specifically notes that
-the output tracks IN fast enough to run it directly from a PWM
-signal.
+Each driver takes two digital inputs. IN selects which side of the
+half-bridge conducts, fast enough to be driven straight from a #gls("pwm")
+signal, and INH enables the device or tristates both sides. The datasheet
+notes that two of them form an H-bridge, and this platform wires exactly
+that, one IC on each motor terminal, so a direction and a speed can be set
+from the pair. How the firmware drives them is covered in @sec:actuator-control.
 
-The datasheet states that two BTN9970LVs can be combined into an
-H-bridge, and this platform does exactly that, with one IC on each
-motor terminal. How this platform's firmware actually drives the two
-ICs to get a direction and a speed out of that pair is covered in
-@sec:actuator-control.
+Each driver also reports its high-side load current on an IS pin, which this
+platform reads per motor terminal on one #gls("adc") channel each, as
+@sec:adc-handling describes. Overcurrent, overtemperature, and undervoltage
+protection are built into the driver and latch it off until the fault clears,
+with no firmware support needed.
 
-Each BTN9970LV also reports its high-side load current back over its
-IS pin as a small analog current. The datasheet gives the load
-current as IL = dkILIS x (IIS - IIS,offset), where dkILIS is a
-differential current sense ratio around 40000 and IIS,offset is a
-fixed offset current around 160uA, both typical values. This platform
-reads that current independently for each motor terminal, one
-#gls("adc") channel per side, as @sec:adc-handling describes.
-
-Overcurrent, overtemperature, and undervoltage protection are built
-into the driver itself. An overcurrent event or the junction temperature exceeding its
-shutdown limit, latches both switches off until the fault is cleared.
-The supply voltage dropping below the undervoltage threshold shuts
-the device down the same way, until it recovers. None of this
-requires firmware support to function.
-
-== ESP8266 (D1 mini) <sec:esp-bridge>
+== WiFi Bridge (ESP8266) <sec:esp-bridge>
 
 The platform's only wireless link is an AZ-Delivery D1 mini, a small
 board built around an ESP8266MOD-12F WiFi module, with 4MB of flash
