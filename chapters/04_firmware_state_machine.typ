@@ -75,14 +75,35 @@ change on every main-loop spin. A change into remote control enters
 steering and speed setpoints directly, and the firmware applies the steering as
 given while the speed PID still holds the commanded speed.
 
-The second mode, `CAR_POINT_FOLLOW`, is entered the same way. Instead of live
-steering, the PC hands the car a path, and an on-car follower computes steering
-and speed each tick. If the path is not valid when the mode starts, the request
-is refused and the car stays put. Either mode is left when the command field
-returns to off, which stops the motor and drops the car back to `CAR_STOP`.
-Engaging a mode also clears the low-battery latch, since it counts as a fresh
-start. While either mode is active it overrides the autonomous loop, so the
-turn detector and the open-road escalation do not run.
+The second mode, `CAR_POINT_FOLLOW`, is entered the same way, but instead of
+live steering the PC hands the car a path to drive on its own. The path is a
+list of points, each with a position and a direction flag that marks it as
+forward or reverse. When the mode starts, the firmware checks the path before
+accepting it. It must have at least two points, every direction flag must be
+valid, and consecutive points must be close enough together. It also splits the
+path into segments wherever the direction flips, so a forward stretch and a
+following reverse stretch become separate segments. If any check fails the
+request is refused and the car stays put.
+
+With a valid path latched, the follower runs once per tick. It has no outside
+position fix while driving, so it dead-reckons its own pose, turning the IMU
+heading and the wheel speed into an updated position each tick, and publishes
+that pose as telemetry. To steer, it uses pure pursuit. It looks a fixed
+distance ahead along the current segment, takes the path point at that
+lookahead, and computes the steering angle that curves the car onto it. A
+reverse segment is handled by aiming with a flipped heading and steering sign,
+so the same geometry drives the car backwards. Speed is a fixed forward or
+reverse pace that ramps down to a crawl as the car nears the end of a segment.
+At a segment end the follower pauses briefly, then picks up the next segment,
+which lets the car settle before it reverses direction. It gives the mode up if
+the path is lost, meaning the next point drifts too far away, or if it commands
+motion but the wheels do not turn for too long.
+
+Either mode is left when the command field returns to off, which stops the
+motor and drops the car back to `CAR_STOP`. Engaging a mode also clears the
+low-battery latch, since it counts as a fresh start. While either mode is
+active it overrides the autonomous loop, so the turn detector and the open-road
+escalation do not run.
 
 == Turn Detection Algorithm <sec:turn-detection>
 
