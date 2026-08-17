@@ -1,4 +1,4 @@
-#import "@preview/glossarium:0.5.10": gls, glspl
+#import "/helpers/gls.typ": gls, glspl
 
 = Introduction <ch:introduction>
 

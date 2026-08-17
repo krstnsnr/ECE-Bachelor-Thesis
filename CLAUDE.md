@@ -203,22 +203,27 @@ the colleague's.
   built on `fletcher`.
 - [helpers/glossary-definitions.typ](helpers/glossary-definitions.typ): the
   abbreviations/glossary term list (via `@preview/glossarium`). Add new terms
-  here as `(key, short, long, description)` tuples; reference them in text
-  with `#gls("key")` / `#glspl("key")`, a plain string matching the `key`
-  field, not a Typst label (`#gls(<key>)` panics inside glossarium 0.5.10
-  with "type label has no method `first`"; its own doc comment says `key
-  (str)`). **Every chapter file that uses `#gls`/`#glspl` needs its own**
-  `#import "@preview/glossarium:0.5.10": gls, glspl` **at the top**;
+  here as `(key, short, long, description)` tuples; keep `description` short,
+  ideally a single line, since the glossary is printed in one column and long
+  descriptions wrap (see `helpers/glossary.typ`).
+  Reference them in text with `#gls("key")` / `#glspl("key")`, a plain string
+  matching the `key` field, not a Typst label (`#gls(<key>)` panics inside
+  glossarium 0.5.10 with "type label has no method `first`"; its own doc
+  comment says `key (str)`). **Every chapter file that uses `#gls`/`#glspl`
+  needs its own** `#import "/helpers/gls.typ": gls, glspl` **at the top**;
   `#include` does not inherit the includer's imports, so each chapter is
-  its own scope. `show-list-of` in `main.typ` must contain `"glossary"` or
-  the glossary registry is never populated (`register-glossary` only runs
-  inside that front-matter branch in `iee-template.typ`), so `#gls()` calls
-  anywhere in the thesis would fail to resolve if it were turned off.
-  Convention going forward: the first time a new acronym or unfamiliar term
-  appears anywhere in the document (reading order, chapter 1 onward), add
-  it to `gls-entries` if it isn't there yet and wrap that first occurrence
-  with `#gls("key")`; leave later occurrences of the same term as plain
-  text. Don't wrap terms inside headings.
+  its own scope. Import from `helpers/gls.typ`, not from glossarium directly:
+  those wrappers force the short form (`first: false`) so only the
+  abbreviation ever appears in the text, including the first occurrence. The
+  long form lives only in the glossary. `show-list-of` in `main.typ` must
+  contain `"glossary"` or the glossary registry is never populated
+  (`register-glossary` only runs inside that front-matter branch in
+  `iee-template.typ`), so `#gls()` calls anywhere in the thesis would fail to
+  resolve if it were turned off. Convention going forward: the first time a
+  new acronym or unfamiliar term appears anywhere in the document (reading
+  order, chapter 1 onward), add it to `gls-entries` if it isn't there yet and
+  wrap that first occurrence with `#gls("key")`; leave later occurrences of
+  the same term as plain text. Don't wrap terms inside headings.
 - [helpers/bib/ECEtempBib.bib](helpers/bib/ECEtempBib.bib): BibTeX
   references, cited via Typst's built-in `#cite`/`bibliography()` (IEEE
   style, set in `main.typ`).
