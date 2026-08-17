@@ -317,3 +317,17 @@ the colleague's.
   with "CrazyCar is ..." after separate edits. Check that the paragraph
   transitions still flow and rework the opening/transition sentence if a
   fix to one paragraph made it repeat or clash with its neighbor.
+- Weave cross-references and citations into the sentence grammar instead of
+  tacking them on as a trailing parenthetical. Write "the bring-up is
+  covered in `@sec:main-pcb`" or "as `@sec:i2c-stack` describes", not "the
+  board (`@sec:main-pcb`)"; and let citations read as part of the prose, for
+  example "documented by its original author `@LaesserXRayLegacy2023`" rather
+  than a bare "(`@LaesserXRayLegacy2023`)". The same applies to figures,
+  "shown in `@fig:x`" reads better than a trailing "(`@fig:x`)". End-of-
+  sentence `(@sec:x)` pointers should usually become part of the sentence, or
+  a short sentence of their own ("`@sec:pcb-impact-summary` reports the
+  oversights that surfaced."). A brief parenthetical is only acceptable when
+  the reference is genuinely incidental, or inside a definitional aside that
+  is already parenthetical (for example listing "the sensor suite in
+  `@ch:hardware`" among other items). Don't stack two "as ... describes"
+  clauses in one sentence; if a sentence needs two references, split it.

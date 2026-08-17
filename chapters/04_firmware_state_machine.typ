@@ -37,7 +37,8 @@ opening branches into the matching turn state, which settles back into
 The remaining states sit outside this loop. `CAR_RECOVER` is entered from any
 driving state on a crash or stuck event and returns to `CAR_STRAIGHT` when the
 reverse maneuver finishes, while a latching low-battery cutoff forces the car
-back to `CAR_STOP` from anywhere (see @sec:flag-events). `CAR_REMOTE_CONTROL`
+back to `CAR_STOP` from anywhere. @sec:flag-events describes the event
+mechanism behind both. `CAR_REMOTE_CONTROL`
 and `CAR_POINT_FOLLOW` are entered on an operator command and released back to
 `CAR_STOP`.
 

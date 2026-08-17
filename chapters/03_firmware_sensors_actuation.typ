@@ -39,13 +39,13 @@ whichever motor driver is currently doing the driving. Its channel
 is read every 50Hz sample for as long as the commanded direction
 stays the same, while the idle side is not sampled at all, since its
 current-sense output is not a valid reading while it is
-not driving (@sec:motor-drivers). The state machine reads that same
+not driving, as @sec:motor-drivers explains. The state machine reads that same
 telemetry each 100Hz tick and drives two
 PID controllers, one for motor speed and one for steering,
-which in turn set the ESC and servo outputs (@sec:actuator-control).
+which in turn set the ESC and servo outputs, covered in @sec:actuator-control.
 
 Splitting the firmware this way keeps each module narrow. Sensor
-drivers only know how to talk to their own chip (@sec:sensor-drivers).
+drivers, described in @sec:sensor-drivers, only know how to talk to their own chip.
 The telemetry globals are just data, readable and writable by name so
 the OTA link can expose them to the AI-MotionLab testsuite without
 every module needing its own protocol code. The state machine only
@@ -56,7 +56,7 @@ actuator directly.
 === I2C Sensor Stack Integration and Address Assignment at Startup <sec:i2c-stack>
 
 Five I2C devices, three ToF sensors, the ADC, and the IMU, share the
-STM32's single I2C1 bus (@sec:mcu). Each has to be reachable at its
+STM32's single I2C1 bus introduced in @sec:mcu. Each has to be reachable at its
 own address before its driver can be used. @fig:i2c-startup shows the
 order this happens in during boot and the address each device ends up
 at.
@@ -67,16 +67,16 @@ at.
 ) <fig:i2c-startup>
 
 The three ToF sensors are the reason this has to be a sequence at
-all. Every VL53L1X boots at the same fixed address (@sec:tof), so
+all. Every VL53L1X boots at the same fixed address, as noted in @sec:tof, so
 this platform's firmware holds all three in hardware standby and
 brings them up one at a time, each getting reassigned to its own 8-bit
 address (0x30, 0x32, 0x34) before the next is released. Only once all
 three have a unique address does ranging start on any of them.
 
 The ADC and IMU need no such dance. The ADS7128's address is set in
-hardware by a resistor on its ADDR pin (@sec:adc), tied on this
+hardware by a resistor on its ADDR pin, as @sec:adc describes, tied on this
 platform to give address 0x20, and the BNO055's by the level on its
-COM3 pin (@sec:imu). Both are already unique by the time their init
+COM3 pin, as @sec:imu describes. Both are already unique by the time their init
 functions run, so each just confirms the device answers where it is
 expected to.
 
@@ -105,7 +105,7 @@ over from the previous channel is never mistaken for a valid one.
 This platform uses three of the eight channels. One reads the
 battery voltage through a 10kOhm/18kOhm divider. The other two read
 the negative and positive-side current-sense outputs of the
-BTN9970LV half-bridge motor drivers (@sec:motor-drivers), each
+BTN9970LV half-bridge motor drivers, described in @sec:motor-drivers, each
 converted from the driver's IS pin current to a voltage across a
 2kOhm sense resistor before the ADC channel sees it.
 
@@ -124,7 +124,7 @@ matching telemetry global.
 == Actuator Control <sec:actuator-control>
 
 Both the steering and speed PID controllers that the state machine
-drives each 100Hz tick (@sec:app-structure) share one implementation.
+drives each 100Hz tick, introduced in @sec:app-structure, share one implementation.
 A `PID_t` instance holds its own gains, an accumulated integral term,
 and the previous error, alongside output limits. Each call first
 computes the error as setpoint minus measurement. It then computes a
@@ -151,7 +151,7 @@ live tuning on top of the original SIMC starting point.
 
 The speed PID's output drives the motor through `Motor_SetSpeed()`.
 The two BTN9970LV half-bridges that make up the drive motor's
-H-bridge (@sec:motor-drivers) each take an IN pin, which selects
+H-bridge, covered in @sec:motor-drivers, each take an IN pin, which selects
 which side of that half-bridge switches on, and an INH pin, which
 enables it or tristates it entirely. This platform sets each IC's IN
 pin to a fixed level for the duration of a direction, IN1 high for

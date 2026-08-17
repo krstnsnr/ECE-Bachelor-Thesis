@@ -22,7 +22,7 @@ predictable setup on a smooth indoor track to a looser one that tolerates
 a rougher surface. Second, the kit ships bare. Radio, servo, #gls("esc"),
 motor, and battery are not included. The electronics have to be built up from
 scratch, which is exactly the gap this thesis's firmware and this
-platform's #gls("pcb") (@sec:main-pcb) fill. Being a widely sold competition kit
+platform's #gls("pcb"), covered in @sec:main-pcb, fill. Being a widely sold competition kit
 also means worn or crashed parts are easy to source and replace, which
 matters when a fleet of these cars is driven by students.
 
@@ -41,7 +41,8 @@ the platform together. The #gls("i2c") sensor stack, the motor and
 steering drivers, the ADC, and the #gls("esp") WiFi bridge all mount
 to it, alongside the Nucleo board carrying the STM32H533RE itself.
 This thesis's firmware runs on that PCB, and this thesis is also the
-first to bring the board up and evaluate it (@sec:pcb-impact-summary).
+first to bring the board up and evaluate it. @sec:pcb-impact-summary
+reports the oversights that surfaced during that evaluation.
 
 #figure(
   image("/assets/pictures/XRayLegacy_PCB_TopView.png", width: 70%),
@@ -54,7 +55,7 @@ first to bring the board up and evaluate it (@sec:pcb-impact-summary).
 This thesis's firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
 development board carrying an STM32H533RET6 microcontroller
 @UM3121_2025. That microcontroller choice came with the #gls("pcb")
-(@sec:main-pcb). What follows is why it turned out
+introduced in @sec:main-pcb. What follows is why it turned out
 to be a good fit for the firmware built on top of it.
 
 #figure(
@@ -78,10 +79,11 @@ exposes three I2C interfaces, four #gls("spi") interfaces, six
 wide set of general-purpose and #gls("pwm")-capable timers
 @STM32H533xx2026. That peripheral count fits this platform directly. The
 I2C buses are enough to host the ADS7128 #gls("adc"), the BNO055
-#gls("imu"), and the VL53L1X distance sensors (@sec:i2c-stack), a
+#gls("imu"), and the VL53L1X distance sensors, a
 #gls("usart") carries the ESP8266 WiFi bridge traffic, and the
-#gls("pwm") timers drive the motor and steering actuators
-(@sec:actuator-control).
+#gls("pwm") timers drive the motor and steering actuators. The firmware
+side of both, address assignment and actuator control, is covered in
+@sec:i2c-stack and @sec:actuator-control.
 
 The Nucleo-64 board wraps that microcontroller with everything needed to
 start developing right away. An on-board STLINK-V3EC debugger and
@@ -99,7 +101,7 @@ telemetry workflow.
 One STM32H5 feature matters beyond raw specs. The series includes a
 #gls("rom") system memory bootloader that this thesis's over-the-air update path
 uses to reflash the car over WiFi, without setting aside any of the
-512 Kbytes of flash for a bootloader of its own (@ch:integration).
+512 Kbytes of flash for a bootloader of its own, as @ch:integration details.
 
 == Sensor Suite <sec:sensors>
 
@@ -129,13 +131,13 @@ matters on a track where the car has to range off wood barriers reliably.
 
 The bare VL53L1X is a fully integrated LGA12 package measuring
 4.9 x 2.5 x 1.56mm. On this platform each of the three sensors sits on
-a Pimoroni breakout board (@fig:tof-sensor), which brings the module's
+a Pimoroni breakout board, shown in @fig:tof-sensor, which brings the module's
 pins out to a row of solder pads. The breakout is still small enough
 to mount on the chassis. It
 communicates over #gls("i2c") at up to 400kHz. It also exposes an
 active-low XSHUT pin for hardware shutdown and a GPIO1 interrupt
 output. This platform's firmware uses XSHUT to sequence startup when
-more than one sensor shares the bus (@sec:i2c-stack).
+more than one sensor shares the bus, as @sec:i2c-stack describes.
 
 Ranging behavior is controlled through three parameters. Distance mode
 selects between short, medium, and long range. It trades maximum
@@ -160,7 +162,7 @@ hardware standby with no I2C activity, so each sensor can be woken and
 assigned a unique address in turn while the others stay held down. This
 platform's firmware wires its own XSHUT line to each sensor and steps
 through them one at a time at startup, reassigning each to its own
-address before the next is released (@sec:i2c-stack).
+address before the next is released, a sequence @sec:i2c-stack walks through.
 
 The three sensors are not configured identically. The front sensor runs
 in long distance mode with a 33ms timing budget, the fastest budget the
@@ -241,10 +243,10 @@ The platform's external ADC is a Texas Instruments ADS7128, an
 WQFN package @ADS71282020. Each of its eight channels can be
 independently configured as an analog input, a digital input, or a
 GPIO output, and an internal oscillator drives the conversion process,
-so the device needs no clock from the host. The STM32H533RE has only 
-two internal ADCs of its
-own (@sec:mcu), while the ADS7128 sits on the same I2C bus as the
-rest of the sensor stack (@sec:i2c-stack) and adds eight more channels
+so the device needs no clock from the host. As noted in @sec:mcu, the
+STM32H533RE has only two internal ADCs of its
+own, while the ADS7128 sits on the same I2C bus as the
+rest of the sensor stack and adds eight more channels
 without using any of the microcontroller's own ADC pins, more
 headroom than this platform ends up needing.
 
@@ -322,7 +324,7 @@ current as IL = dkILIS x (IIS - IIS,offset), where dkILIS is a
 differential current sense ratio around 40000 and IIS,offset is a
 fixed offset current around 160uA, both typical values. This platform
 reads that current independently for each motor terminal, one
-#gls("adc") channel per side (@sec:adc-handling).
+#gls("adc") channel per side, as @sec:adc-handling describes.
 
 Overcurrent, overtemperature, and undervoltage protection are built
 into the driver itself. An overcurrent event or the junction temperature exceeding its
@@ -339,8 +341,8 @@ and a micro-USB connector used for both power and programming
 @AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor
 and pinout as the original WeMos design, but this platform uses
 AZ-Delivery's own board, not a genuine WeMos part. On this platform it
-does one job. It sits on the USART between the STM32 and the
-AI-MotionLab testsuite (@sec:mcu), moving telemetry and #gls("ota")
+does one job. It sits on the USART described in @sec:mcu, between the
+STM32 and the AI-MotionLab testsuite, moving telemetry and #gls("ota")
 update traffic over WiFi that would otherwise need a wired connection
 to the car.
 

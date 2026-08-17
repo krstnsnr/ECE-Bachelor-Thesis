@@ -29,13 +29,13 @@ repeatable performance data across many runs.
 This thesis is about modernizing that platform lineage into one that
 supports this kind of ongoing, research-grade testing and tuning.
 The chassis and main #gls("pcb") have already moved to a newer
-hardware baseline built around an STM32H533RE microcontroller
-(@sec:crazycar-history, @ch:hardware). This thesis gives that hardware
-baseline its first application firmware, brings the board up, and debugs
-the problems that surfaced along the way. It also connects the platform to
-FH JOANNEUM's AI-MotionLab for the first time, a shared test infrastructure
-that can observe a car on track without instrumenting the track itself
-(@sec:ai-motionlab-role).
+hardware baseline built around an STM32H533RE microcontroller, introduced in
+@sec:crazycar-history and detailed in @ch:hardware. This thesis gives that
+hardware baseline its first application firmware, brings the board up, and
+debugs the problems that surfaced along the way. It also connects the
+platform to FH JOANNEUM's AI-MotionLab for the first time, a shared test
+infrastructure described in @sec:ai-motionlab-role that can observe a car on
+track without instrumenting the track itself.
 This thesis defines modernizing the platform in three parts. First, the new
 firmware must drive the car autonomously. Second, it must expose its
 internal state and parameters at runtime. Third, #gls("pid") gains for steering and
@@ -49,21 +49,21 @@ that tuning workflow.
 CrazyCar is FH JOANNEUM's name for a small, sensor-driven car that drives
 itself autonomously around a track. It is not a single, fixed
 design. Chassis, main #gls("pcb"), and microcontroller have all changed between
-iterations of the project, from the MSP430-based lab exercise discussed
-above (@sec:motivation) to the platform this thesis works with. What stays
+iterations of the project, from the MSP430-based lab exercise discussed in
+@sec:motivation to the platform this thesis works with. What stays
 constant is the basic idea, namely a four-wheel-drive, 1/18-scale car that
 senses its surroundings, decides how to steer and accelerate, and races
 around a course on its own.
 
 The specific instance this thesis builds firmware for is built on an XRAY
-M18 Pro LiPo 4WD chassis (@ch:hardware, @sec:chassis), a commercially
-available 1/18-scale RC chassis chosen for its robustness and ready
+M18 Pro LiPo 4WD chassis, a commercially available 1/18-scale RC chassis
+detailed in @sec:chassis and chosen for its robustness and ready
 availability of spare parts, properties that matter when a fleet of cars is
 driven by students and expected to survive repeated crashes. The main
 #gls("pcb") was designed by A. Läßer specifically for this STM32-based generation of
 the platform and is documented separately by its original author
 @LaesserXRayLegacy2023. This thesis is the first to bring that board up and
-test it; redesigning it is explicitly out of scope (@sec:non-goals). The
+test it, and @sec:non-goals places redesigning it explicitly out of scope. The
 work described here starts from that hardware baseline, a Nucleo-H533RE
 board (STM32H533RE microcontroller) mounted on that #gls("pcb") together with its
 sensor and actuator peripherals, and develops the application firmware for
@@ -81,7 +81,7 @@ developed the testsuite alongside this thesis's firmware, in parallel
 so the two projects grew together. The parts of the
 testsuite relevant to this thesis are the ones the STM32 firmware talks to
 directly, primarily the car communication module that issues text commands
-over the wireless bridge (@ch:integration). Track geometry used by the
+over the wireless bridge, described in @ch:integration. Track geometry used by the
 testsuite is supplied manually, as a hand-authored map of the room and lap and segment
 timing is computed by testsuite logic that the same colleague implemented.
 Both are used in this thesis as existing infrastructure the evaluation in
@@ -130,11 +130,11 @@ The goals of this thesis are:
 
 The following are explicitly out of scope for this thesis:
 
-- #gls("pcb") design for the CrazyCar platform. The main #gls("pcb") was designed by someone
-  else specifically for this platform generation (@sec:main-pcb,
-  @LaesserXRayLegacy2023). This thesis brings that board up, evaluates it,
-  and reports oversights found while testing (@sec:pcb-impact-summary), but
-  does not redesign it.
+- #gls("pcb") design for the CrazyCar platform. As @sec:main-pcb covers, the
+  main #gls("pcb") was designed by someone else specifically for this
+  platform generation @LaesserXRayLegacy2023. This thesis brings that board
+  up, evaluates it, and reports the oversights found while testing in
+  @sec:pcb-impact-summary, but does not redesign it.
 - Modifications to the AI-MotionLab itself, including its OptiTrack setup
   and the PySide testsuite application beyond the firmware-facing
   communication path described in @ch:integration.
