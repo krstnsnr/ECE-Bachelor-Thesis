@@ -68,7 +68,24 @@ the flags and reacts, which makes both parts easier to reason about and test.
 == Turn Detection Algorithm <sec:turn-detection>
 
 === Rate-of-Change Threshold on Side ToF Sensors <sec:turn-rate-threshold>
-// distance-normalized
+
+The car recognizes a corner from its two side ToF sensors. Along a straight
+the side distances stay roughly constant, but at an opening the distance on
+that side jumps up as the wall falls away. The detector keys on that jump.
+
+What matters is not how fast the distance grows in time, but how fast it grows
+relative to how far the car has driven. A slow car and a fast car pass the
+same opening and should both see the same corner. Each side keeps a short ring
+buffer of its last four samples. The slope is the change across that buffer
+divided by the distance traveled over the same span, obtained from the wheel
+speed and the tick period. The result is a distance-normalized rate of change,
+in millimeters of side clearance gained per millimeter of forward travel, and
+it does not depend on speed.
+
+An opening is flagged when that slope exceeds a fixed threshold for two consecutive ticks. 
+The two-tick confirmation rejects a single noisy
+sample. A distance reading below 20mm is treated as invalid and held at the last good
+value, so a sensor dropout does not look like a jump.
 
 === Alignment and Wall-Ahead Preconditions <sec:turn-preconditions>
 
