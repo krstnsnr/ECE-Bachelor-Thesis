@@ -30,7 +30,29 @@ appear here only to show what the firmware's telemetry and parameter fields are
 used for.
 
 == Car Communication Module <sec:car-comm-module>
-// bridging car_ota.py into the GUI
+
+The testsuite reaches a car over WiFi. It opens a network connection to the
+car's ESP8266 bridge, which passes the traffic on to the STM32 over a UART
+link. Each car carries its own bridge and answers to its own name on the
+network, so the testsuite can address one of several cars at a time.
+
+#figure(
+  image("/assets/graphics/selfdrawn/comm_chain.svg", width: 90%),
+  caption: [Communication path from the testsuite to the car firmware],
+) <fig:comm-chain>
+
+On the car, the firmware receives each command as a framed packet, a command
+byte, a length, the payload, and a CRC32 trailer. It checks the CRC with the
+STM32's hardware CRC unit, and only a frame that passes is acted on. A text
+command is dispatched to a small handler that produces a reply, which is framed
+and CRC-tagged the same way before it is sent back. The command set itself is
+covered in @sec:pid-tuning.
+
+On the PC side, the car communication module wraps this protocol so the docks
+do not deal with framing or transport. Its low-level send, receive, and
+discovery functions come from a standalone OTA tool that carries the same wire
+format. Both the module and that tool are Polivka's work @PolivkaTestsuite2026,
+and the firmware's role is only to answer the commands they send.
 
 == Live Telemetry Graphing <sec:telemetry-graphing>
 // PID/tuning feedback loop
