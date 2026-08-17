@@ -347,7 +347,7 @@ update traffic over WiFi that would otherwise need a wired connection
 to the car.
 
 #figure(
-  image("/assets/pictures/D1_Mini_TopDown.jpg", width: 40%),
+  image("/assets/pictures/D1_Mini_TopDown.jpg", width: 30%),
   caption: [AZ-Delivery D1 mini, top-down view],
 ) <fig:d1-mini>
 #align(center, text(size: 9pt, style: "italic")[Image source: @AZDeliveryD1Mini2026])
