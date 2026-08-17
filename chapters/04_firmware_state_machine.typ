@@ -65,6 +65,25 @@ sample cannot flip a state. Using flags rather than direct transitions keeps
 the detection separate from the driving logic. The state machine only reads
 the flags and reacts, which makes both parts easier to reason about and test.
 
+=== Remote Control and Point Follow <sec:operator-modes>
+
+Beyond the autonomous loop, the state machine has two modes the operator drives
+from the PC side over the OTA link. A single command field selects between off,
+remote control, and point follow, and the sync step watches that field for a
+change on every main-loop spin. A change into remote control enters
+`CAR_REMOTE_CONTROL` from whatever state the car was in. There the PC sends the
+steering and speed setpoints directly, and the firmware applies the steering as
+given while the speed PID still holds the commanded speed.
+
+The second mode, `CAR_POINT_FOLLOW`, is entered the same way. Instead of live
+steering, the PC hands the car a path, and an on-car follower computes steering
+and speed each tick. If the path is not valid when the mode starts, the request
+is refused and the car stays put. Either mode is left when the command field
+returns to off, which stops the motor and drops the car back to `CAR_STOP`.
+Engaging a mode also clears the low-battery latch, since it counts as a fresh
+start. While either mode is active it overrides the autonomous loop, so the
+turn detector and the open-road escalation do not run.
+
 == Turn Detection Algorithm <sec:turn-detection>
 
 === Rate-of-Change Threshold on Side ToF Sensors <sec:turn-rate-threshold>
@@ -161,7 +180,3 @@ completes near its target once the front opens. A turn that does not complete
 as a 90-degree corner can only be a hairpin, so the car exits once it has
 turned a full 180 degrees, whether or not the front has opened by then. This
 bounds every turn at half a rotation and guarantees the turn state always ends.
-
-// Remaining open item from the old "Future Work" chapter:
-// remote-control state (CAR_REMOTE_CONTROL) already implemented -- describe
-// its transition conditions here rather than as an outlook item
