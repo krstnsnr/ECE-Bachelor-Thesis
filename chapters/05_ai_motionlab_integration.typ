@@ -70,13 +70,46 @@ request comes in.
 The testsuite shows the sensor fields in a live table, one row per field, that
 it refreshes on demand or polls continuously. Values arrive as plain numbers,
 and the coded fields are annotated with their meaning, so a state of 5 reads as
-full throttle and an event of 2 as a crash. This display is part of Polivka's
-testsuite @PolivkaTestsuite2026. The writable parameters are shown and edited in
-a separate panel, used for the tuning workflow in @sec:pid-tuning.
+full throttle and an event of 2 as a crash.  The writable parameters are shown 
+and edited in a separate panel, used for the tuning workflow in @sec:pid-tuning.
 
 == Session Logging <sec:session-logging>
-// laps, events, PID changes
+
+The testsuite can record a run in two ways, both writing plain-text JSON files
+with one record per line.
+
+- A continuous run log captures timestamped telemetry and pose at the streaming
+  rate for the whole run. It is overwritten on each new run and takes in both the
+  parameter and sensor fields the car reports, so an entire run, including
+  unfinished laps, can be replayed field by field.
+- A complete-laps log appends one record per finished lap. Each record carries
+  the lap time and its sector splits, the position trace, the PID gains in
+  force, and the sensor readings.
+
+The telemetry in both comes straight from the fields the firmware exposes. The
+logging itself, along with the lap timing and pose that feed it, is part of
+Polivka's testsuite @PolivkaTestsuite2026.
 
 == Using GET/SET Commands for On-the-Fly PID Tuning <sec:pid-tuning>
+
+The text protocol has two commands for the telemetry fields. `GET` reads and
+`SET` writes. A `GET` names a single field and gets its value back, or names a
+whole group, all fields, only the parameters, or only the sensors, and gets
+each one in turn. A `SET` names a writable field and a value. Only fields in
+the parameters table accept a `SET`, so the read-only sensors can never be
+written from outside.
+
+Every `SET` is validated on the car before it takes effect. The firmware parses
+the value, requiring the whole token to be a valid number, and checks that it is
+finite and within a fixed range. A value that passes is written and the car
+replies `OK`, otherwise it replies with an error and leaves the field
+unchanged. Keeping this check on the car means a malformed command can never
+corrupt a parameter.
+
+This is what makes live tuning work. The steering and throttle PID gains are
+parameters, and the state machine reloads them into its controllers at the
+start of every tick. A gain written over the link therefore takes effect on the
+next control step, with no rebuild and no reflash, so the operator can adjust
+the car while it drives and see the result at once.
 
 == Workflow: From Firmware Build to On-Track Parameter Tuning <sec:workflow>
