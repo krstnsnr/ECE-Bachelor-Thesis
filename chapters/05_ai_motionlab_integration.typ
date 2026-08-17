@@ -54,8 +54,25 @@ discovery functions come from a standalone OTA tool that carries the same wire
 format. Both the module and that tool are Polivka's work @PolivkaTestsuite2026,
 and the firmware's role is only to answer the commands they send.
 
-== Live Telemetry Graphing <sec:telemetry-graphing>
-// PID/tuning feedback loop
+== Live Telemetry Display <sec:telemetry-display>
+
+The firmware keeps its telemetry in two flat tables of named values. One holds
+the read-only sensor fields the car reports, such as the three distances, speed
+and direction, acceleration, heading and yaw rate, battery voltage and motor
+current, and the current state and event. The other holds the writable
+parameters, mainly the steering and throttle PID gains. Each entry is just a
+name and a pointer to a global variable, and the table a field lives in sets
+its permission, so a sensor can only be read while a parameter can also be
+written. The sensor drivers, control loop, and state machine write into these
+globals every tick, and the command handler reads or writes them by name when a
+request comes in.
+
+The testsuite shows the sensor fields in a live table, one row per field, that
+it refreshes on demand or polls continuously. Values arrive as plain numbers,
+and the coded fields are annotated with their meaning, so a state of 5 reads as
+full throttle and an event of 2 as a crash. This display is part of Polivka's
+testsuite @PolivkaTestsuite2026. The writable parameters are shown and edited in
+a separate panel, used for the tuning workflow in @sec:pid-tuning.
 
 == Session Logging <sec:session-logging>
 // laps, events, PID changes
