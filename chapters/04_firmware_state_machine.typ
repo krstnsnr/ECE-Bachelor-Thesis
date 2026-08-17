@@ -4,55 +4,42 @@
 
 === Overview of States and Transitions <sec:states-transitions>
 
-The driving logic is organized as a finite state machine. It runs once per
-control-loop tick at 100Hz. Each tick does two things in order. It executes
-the action of the current state, and it then evaluates the transition
-conditions to decide which state runs on the next tick. The current state is
-mirrored into a telemetry global on every change, so the PC side testsuite can
-follow the car's behavior live.
+The driving logic is organized as a finite state machine, run once per
+control-loop tick at 100Hz. Each tick first executes the action of the current
+state and then evaluates the transition conditions for the next tick. The
+current state is mirrored into a telemetry global, so the PC side testsuite can
+follow the car's behavior live. Nine states are defined.
 
-Nine states are defined, listed here in the order the car normally moves
-through them.
-
-- `CAR_STOP` holds the motor at neutral and the steering centered. It is the
-  power-on state and the state the car falls back to whenever driving must
-  end.
-- `CAR_START` is a short launch state that resets the steering and speed
-  controllers before the car begins to move.
-- `CAR_FULL_THROTTLE` follows the walls on an open stretch and scales its
-  speed with the distance to the wall ahead.
-- `CAR_STRAIGHT` follows the walls at a more moderate pace, used after a turn
-  until the track opens up again.
-- `CAR_TURN_LEFT` and `CAR_TURN_RIGHT` steer the car through a corner once an
-  opening has been detected on that side.
-- `CAR_RECOVER` reverses the car briefly to free it after a crash or when it
-  gets stuck against an obstacle.
+- `CAR_STOP` centers the steering and holds the motor at neutral. It is the
+  power-on state and the fallback whenever driving must end.
+- `CAR_START` is a short launch state that resets the controllers before the
+  car moves.
+- `CAR_FULL_THROTTLE` and `CAR_STRAIGHT` both follow the walls, the former at
+  full pace on an open stretch and the latter at a moderate pace after a turn.
+- `CAR_TURN_LEFT` and `CAR_TURN_RIGHT` steer through a corner once an opening
+  is detected on that side.
+- `CAR_RECOVER` reverses briefly to free the car after a crash or when it gets
+  stuck.
 - `CAR_REMOTE_CONTROL` and `CAR_POINT_FOLLOW` are operator-driven modes, in
-  which the PC side either steers the car directly or hands it a path to
-  follow.
+  which the PC side either steers directly or hands the car a path to follow.
 
-@fig:state-machine shows the core autonomous driving loop. From `CAR_STOP` a
-start command moves the car into `CAR_START`, which launches straight into
-`CAR_FULL_THROTTLE`. While driving on an open stretch, the car watches its
-side sensors for an opening. A detected opening to the left or right sends it
-into the matching turn state. When the turn is complete the car settles into
-`CAR_STRAIGHT`, and once the track ahead has stayed open long enough it
-escalates back to `CAR_FULL_THROTTLE`. This loop between straight driving and
-turning is what carries the car around the track.
+@fig:state-machine shows the core autonomous loop. A start command moves the
+car from `CAR_STOP` through `CAR_START` into `CAR_FULL_THROTTLE`. A detected
+opening branches into the matching turn state, which settles back into
+`CAR_STRAIGHT` once complete, and a long enough open stretch escalates
+`CAR_STRAIGHT` back to `CAR_FULL_THROTTLE`.
 
 #figure(
   image("/assets/graphics/selfdrawn/state_machine.svg", width: 100%),
   caption: [Core autonomous driving states and their transitions],
 ) <fig:state-machine>
 
-Three states sit outside this main loop. `CAR_RECOVER` is entered from any
-driving state when the event mechanism reports a crash or a stuck car, and it
-returns to `CAR_STRAIGHT` after the reverse maneuver finishes. A latching
-low-battery cutoff forces the car back to `CAR_STOP` from anywhere and keeps
-it there. The event mechanism behind both is described in @sec:flag-events.
-`CAR_REMOTE_CONTROL` and `CAR_POINT_FOLLOW` are entered on an operator command
-from the PC side and released back to `CAR_STOP`, independent of the
-autonomous loop.
+The remaining states sit outside this loop. `CAR_RECOVER` is entered from any
+driving state on a crash or stuck event and returns to `CAR_STRAIGHT` when the
+reverse maneuver finishes, while a latching low-battery cutoff forces the car
+back to `CAR_STOP` from anywhere (see @sec:flag-events). `CAR_REMOTE_CONTROL`
+and `CAR_POINT_FOLLOW` are entered on an operator command and released back to
+`CAR_STOP`.
 
 === Flag-Based Event Mechanism <sec:flag-events>
 
