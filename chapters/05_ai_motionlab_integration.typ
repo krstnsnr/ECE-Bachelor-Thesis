@@ -113,3 +113,24 @@ next control step, with no rebuild and no reflash, so the operator can adjust
 the car while it drives and see the result at once.
 
 == Workflow: From Firmware Build to On-Track Parameter Tuning <sec:workflow>
+
+Putting the pieces together gives a fast build, test, and tune loop that the
+earlier CrazyCar generation could not offer.
+
+A firmware change starts with a build. The STM32 project is compiled to a binary
+and sent to the car over WiFi, so a new image reaches the car without a wired
+debugger, once the car has been brought up with one at least once. With the
+image running, the car is started on the track and drives itself in the
+AI-MotionLab, while its telemetry streams back to the testsuite through the live
+table, the map, and the logs.
+
+Tuning the control parameters needs no new build. The PID gains are written with
+`SET` while the car drives and take effect on the next control step, and each
+change is captured in the session log next to the telemetry, so its effect can
+be compared across runs. Only a change to the firmware logic itself calls for
+another build and a fresh flash.
+
+#figure(
+  image("/assets/graphics/selfdrawn/tuning_workflow.svg", width: 100%),
+  caption: [Build, test, and tune loop, with fast parameter tuning and a slower firmware rebuild path],
+) <fig:workflow>
