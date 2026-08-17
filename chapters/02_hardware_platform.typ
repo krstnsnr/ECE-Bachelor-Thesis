@@ -245,7 +245,7 @@ telling forward from reverse matters for the speed controller.
 
 The drive motor is switched by two Infineon BTN9970LV half-bridge
 drivers from Infineon's NovalithIC+ family @BTN9970LV2021. Each
-integrates a high-side and a low-side #gls("mosfet") with a driver IC
+integrates a high-side and a low-side MOSFET with a driver IC
 in one automotive-qualified package.
 
 #figure(
