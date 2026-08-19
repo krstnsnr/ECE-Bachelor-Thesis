@@ -44,7 +44,31 @@ The ADC readings, battery voltage and motor current alike, were accurate and
 stable for the whole evaluation.
 
 == State Machine / Turn Detection Performance <sec:turn-performance>
-// success rate over test runs
+
+Corner detection was reliable across the evaluation runs, catching both the
+90 degree corners and the 180 degree hairpins the exit grid in
+@sec:completion-criteria targets. The side ToF ROI changes described in
+@sec:sensor-performance shifted the sensors' readings enough that the slope
+threshold from @sec:turn-rate-threshold needed retuning alongside them, and
+once retuned, every corner on the track was detected cleanly.
+
+`CAR_RECOVER`, introduced in @sec:flag-events, is the least refined of the
+driving states. Freeing a stuck car sometimes took two or three attempts
+rather than one, though the car worked itself free in most cases. Refining
+recovery further took a lower priority in this project, since the tuning
+workflow already repositions a car that fails a lap through
+`CAR_POINT_FOLLOW`, covered next, rather than depending on recovery to
+finish the lap itself.
+
+The two operator-driven modes from @sec:operator-modes both performed well.
+`CAR_REMOTE_CONTROL` worked without issue, since it only passes the
+operator's steering and speed setpoints straight through. `CAR_POINT_FOLLOW`
+also tracked its path well, with a small drift on the straight following a
+corner. The wheel-speed sensor from @sec:hall sits on a single rear wheel,
+so the dead-reckoned pose behind the pure-pursuit follower does not see the
+inner and outer rear wheels turning at different rates through a corner.
+Calibration removed most of this drift, but a small amount remained
+noticeable.
 
 == Usability of the Tuning Platform <sec:usability>
 // time-to-tune, workflow improvements vs. previous approach
