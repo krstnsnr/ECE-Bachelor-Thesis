@@ -8,8 +8,9 @@ The results in @ch:evaluation speak to the three-part definition of
 modernizing the platform from @sec:motivation. The autonomous loop drove the
 car around the track and through both corner types the exit grid in
 @sec:completion-criteria targets, so the first part, driving autonomously,
-was reached. The GET/SET protocol from @sec:pid-tuning let telemetry and
-parameters be read and written at runtime, meeting the second part. And
+was reached. The GET/SET protocol from @sec:pid-tuning let this thesis's
+telemetry and parameter fields be read and written at runtime, meeting the
+second part. And
 @sec:usability shows that runtime tuning cut the iteration loop from a wired
 reflash cycle down to a live gain change, meeting the third.
 
@@ -43,8 +44,8 @@ reached together, not separately. A telemetry and parameter table that was
 only readable would have let the testsuite observe the car without letting
 an operator act on what they saw, and a tuning path that needed its own
 protocol per parameter would not have scaled past the two PID controllers
-this project actually tuned. Building both around the same named-field
-GET/SET mechanism from @sec:telemetry-display and @sec:pid-tuning is what
+this project actually tuned. Relying on the same named-field GET/SET
+mechanism from @sec:telemetry-display and @sec:pid-tuning for both is what
 let a gain change take effect on the next control step, the improvement
 @sec:usability reports.
 
@@ -105,16 +106,17 @@ The lesson carries beyond this one board. A new PCB revision needs time
 budgeted for exactly this kind of hands-on bring-up, not just for the
 firmware that will eventually run on it.
 
-Building the telemetry and parameter tables in @sec:telemetry-display as
-generic named fields, rather than a bespoke protocol message for each
-sensor or gain, turned out to matter more than it seemed to at the time the
-architecture was chosen. Every sensor added in @ch:hardware and every PID
-gain introduced in @sec:actuator-control became visible to the testsuite
-for free, through the same `GET`/`SET` command handler from
-@sec:pid-tuning, with no new protocol code needed on either side. Choosing
-that generic structure early, before it was clear exactly which fields
-tuning would eventually need, is what made the fast tuning loop in
-@sec:workflow possible later.
+Benedikt Polivka's decision to build the telemetry and parameter tables in
+@sec:telemetry-display as generic named fields, rather than a bespoke
+protocol message for each sensor or gain, turned out to matter more to this
+thesis than it might have seemed at the time @PolivkaTestsuite2026. Every sensor added in
+@ch:hardware and every PID gain introduced in @sec:actuator-control became
+visible to the testsuite for free, through the same `GET`/`SET` command
+handler from @sec:pid-tuning, with no new protocol code needed on either
+side. Relying on that generic structure, built before it was clear exactly
+which fields tuning would eventually need, is what let this thesis's
+firmware modules plug straight into the fast tuning loop in @sec:workflow
+without ever touching the protocol itself.
 
 Runtime tuning also changed how much weight the initial PID gains needed to
 carry. The SIMC-derived starting gains from @sec:actuator-control only had
@@ -137,10 +139,10 @@ events in @sec:flag-events, and the discarded IMU glitch step in
 @sec:heading-delta all reject a single noisy reading the same way, before
 it can act on its own.
 
-Developing this firmware while a colleague built the AI-MotionLab testsuite
-in parallel, as @sec:ai-motionlab-role describes, meant the GET/SET
-protocol and the telemetry field names had to work as a stable interface
-between two projects moving at once, not as an afterthought added once one
-side was finished. Settling that protocol early, and keeping both the
-field table and the command set to a small, name-based design, let each
-side keep changing its own code without breaking the other's.
+Developing this firmware while Polivka built the AI-MotionLab testsuite in
+parallel, as @sec:ai-motionlab-role describes, meant his GET/SET protocol
+and telemetry field names had to work as a stable interface between two
+projects moving at once, not as an afterthought added once one side was
+finished @PolivkaTestsuite2026. Settling that protocol early, and keeping
+both the field table and the command set to a small, name-based design,
+let each side keep changing its own code without breaking the other's.

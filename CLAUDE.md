@@ -143,14 +143,32 @@ architecture in depth: OTA protocol, wire format, telemetry field tables,
 GUI module layout). Three code trees live under its `src/`, and each has a
 different relevance to this thesis:
 
-- **`src/STM32/CrazyCar_STM32/`** (the STM32 firmware): entirely Kristian's
-  own work and the main subject of the thesis. Chapters 2 through 4 (hardware
-  platform, sensor/actuation firmware, state machine and turn detection) and
-  the evaluation chapter should draw their technical detail from here: sensor
+- **`src/STM32/CrazyCar_STM32/`** (the STM32 firmware): mostly Kristian's own
+  work and the main subject of the thesis, but **not the GET/SET protocol or
+  the OTA update mechanism**. Chapters 2 through 4 (hardware platform,
+  sensor/actuation firmware, state machine and turn detection) and the
+  evaluation chapter should draw their technical detail from here: sensor
   drivers (`ads7128`, `bno055`, `tof_sensor`, `hall_sensor`), actuation
-  (`motor_control`, `servo_steering`, `pid`, `control_loop`), the state
-  machine (`state_machine.c`, `event_detection.c`), and the OTA/telemetry
-  protocol (`ota.c`, `telemetry_fields.c`).
+  (`motor_control`, `servo_steering`, `pid`, `control_loop`), and the state
+  machine (`state_machine.c`, `event_detection.c`) are his.
+  **Correction: the command protocol, its framing/CRC/dispatch machinery, the
+  OTA update path, and the ESP8266 USART/DMA link driver are Beenno's work,
+  not Kristian's**, confirmed via `git log --diff-filter=A -- <path>` and
+  full author history in the companion repo: `ota.c`/`ota.h` and
+  `esp_uart.c`/`esp_uart.h` carry only Beenno commits (including "communication
+  protocol car side done (ota also working, dual bank)"), and `telemetry_fields.c`
+  was built and repeatedly refactored by Beenno ("simplefied telemetry fields",
+  "Biiiig refactor", "refactoring"); Kristian's own commits there only ever add
+  specific field entries (quaternion/linear-acceleration, the 4-pin Hall
+  fields, point-follow telemetry) into a table mechanism Beenno already built.
+  Frame the GET/SET protocol, telemetry/parameter table mechanism, and OTA
+  path throughout the thesis as existing infrastructure Kristian's sensor,
+  actuation, and state machine modules plug their data into, the same way the
+  PySide testsuite is already framed, never as this thesis's own contribution.
+  What remains Kristian's within that integration is real and worth stating
+  plainly: the specific fields exposed (his sensor readings, PID gains, state
+  and event values) and making sure his firmware builds are flashable over
+  that OTA path.
 - **`src/ai_motionlab/`** (the PySide "Automated Testsuite" GUI, developed by
   a colleague alongside this thesis's firmware, not beforehand): not
   Kristian's work, with one exception. **`src/ai_motionlab/mapping/`** (track
