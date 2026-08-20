@@ -12,7 +12,7 @@
 # Usage:  pwsh scripts/count-words.ps1
 
 param(
-    [string]$ChaptersDir = (Join-Path $PSScriptRoot '..' 'chapters')
+    [string]$ChaptersDir = (Join-Path (Join-Path $PSScriptRoot '..') 'chapters')
 )
 
 $ErrorActionPreference = 'Stop'
