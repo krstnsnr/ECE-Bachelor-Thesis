@@ -19,7 +19,7 @@ project used before the GET/SET protocol was in place, the same baseline
 
 == Sensor Performance <sec:sensor-performance>
 
-The front ToF sensor, running at about 33Hz with its narrow 4x4 ROI, reached a
+The front ToF sensor, running at about 30Hz with its narrow 4x4 ROI, reached a
 maximum usable range of 2.9m on the track. Within that range its readings
 were accurate and reliable throughout testing. The car sits low to the
 ground, and even the minimum 15 degree FoV that the 4x4 ROI gives it still

@@ -50,7 +50,7 @@
 
 #include "chapters/08_conclusion.typ"
 
-#include "chapters/09_appendices.typ"
+//#include "chapters/09_appendices.typ"
 
 #heading(numbering: none)[Bibliography]
 #bibliography("helpers/bib/ECEtempBib.bib", style: "ieee", title: none)
