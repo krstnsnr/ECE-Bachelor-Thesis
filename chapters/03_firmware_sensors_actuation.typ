@@ -30,7 +30,7 @@ still giving the control step itself a fixed 100Hz rate.
 @fig:system-diagram shows how a single control step is
 structured. Every ToF sensor, the IMU, the Hall speed sensor, and the
 ADC all write into one shared set of telemetry globals, alongside the
-start/stop button. Reads happen at different rates depending on the
+start/stop button and the wireless bridge. Reads happen at different rates depending on the
 signal. The IMU and Hall sensor are read every 100Hz tick, the front
 ToF sensor at about 30Hz and the side sensors at 50Hz, and the ADC
 itself splits across two rates, battery voltage at 2Hz and motor
