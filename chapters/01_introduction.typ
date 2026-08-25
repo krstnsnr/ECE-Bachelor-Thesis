@@ -10,13 +10,12 @@ Computer Engineering (ECE) programme at FH JOANNEUM, CrazyCar is that
 concrete project. It is a small, autonomous 1/18-scale racing car that
 gives students one complex system to work on, namely sensing the
 environment, actuating steering and throttle and reacting in real time.
-Iteration cycles stay short, and the hardware is cheap to replace broken parts.
 
 The third-semester "Embedded Systems" lecture uses that same CrazyCar as
 its lab vehicle. Students build a layered (#gls("hal"), #gls("dl"),
 #gls("al")) firmware stack for it on an MSP430F5335 microcontroller as a
 single-semester lab exercise. It covers #gls("gpio"), timers, #gls("pwm"),
-#gls("i2c") and a distance-sensor driver as well as a first driving state
+#gls("spi") and a distance-sensor driver as well as a first driving state
 machine with #gls("pid") control @OkornDiererMayerES. That
 generation of the platform was built to teach embedded systems fundamentals
 within one semester. Within that scope, the application layer, the state
@@ -76,12 +75,13 @@ facility that FH JOANNEUM's Electronic Engineering Institute runs as
 research infrastructure. The "Automated Testsuite" is a separate piece of
 software built on top of that lab, a PySide desktop application that
 renders a live map of the track and the cars on it, logs events during a
-run, and lets a user send commands to a car over WiFi. A colleague
-developed the testsuite alongside this thesis's firmware, in parallel
+ run, and lets a user send commands to a car over WiFi. A colleague,
+ Benedikt Polivka, developed the testsuite alongside this thesis's firmware
+ @PolivkaTestsuite2026, in parallel
 so the two projects grew together. The parts of the
-testsuite relevant to this thesis are the ones the STM32 firmware talks to
-directly, primarily the car communication module that issues text commands
-over the wireless bridge, described in @ch:integration. Track geometry used by the
+testsuite relevant to this thesis are the telemetry and parameter fields that
+the STM32 firmware exposes through the existing communication module,
+described in @ch:integration. Track geometry used by the
 testsuite is supplied manually, as a hand-authored map of the room and lap and segment
 timing is computed by testsuite logic that the same colleague implemented.
 Both are used in this thesis as existing infrastructure the evaluation in
@@ -93,17 +93,17 @@ makes this boundary explicit.
 The new CrazyCar hardware baseline (STM32H533RE, its #gls("pcb"), the sensor and
 actuator suite in @ch:hardware) had no application firmware of its own.
 Sensor drivers, actuation control, autonomous driving logic, and the
-communication path to the AI-MotionLab all needed to be designed and
-implemented before the platform could be driven, let alone tuned or
-evaluated. At the same time, developing that firmware without a way to
+communication path to the AI-MotionLab needed to be integrated with the
+firmware before the platform could be driven, let alone tuned or evaluated.
+At the same time, developing that firmware without a way to
 observe its behavior and adjust its parameters without a wired debugger
 session would make iterating on control-loop tuning and turn detection
 slow and hard to reproduce between runs. This thesis addresses both
 problems together. It builds the STM32 firmware the CrazyCar platform needs
-to drive autonomously, and it builds that firmware so that its parameters
-and telemetry are readable and writable at runtime and its images are
-updatable over the air, so that the existing AI-MotionLab infrastructure can
-be used to tune and evaluate it reproducibly.
+to drive autonomously, and adds the telemetry and parameter fields needed to
+observe and tune that firmware through the communication and OTA
+infrastructure. This allows the AI-MotionLab infrastructure to be used to
+tune and evaluate the platform reproducibly.
 
 == Goals <sec:goals>
 
@@ -119,10 +119,10 @@ The goals of this thesis are:
   state.
 - Develop application firmware for the new CrazyCar hardware baseline
   (STM32H533RE) that drives the car autonomously around a track.
-- Implement the firmware side of an automated test and tuning platform,
-  with runtime-readable and runtime-writable telemetry and parameter
-  fields and an over-the-air firmware update path, so that the AI-MotionLab
-  testsuite can observe and tune the car without a wired connection.
+- Add the firmware telemetry and parameter fields required by the automated
+  test and tuning platform, so that the AI-MotionLab testsuite can observe
+  and tune the car through the existing communication and over-the-air
+  update infrastructure.
 - Evaluate the resulting platform and report the findings, including
   oversights found in the #gls("pcb") design during that evaluation.
 
@@ -136,8 +136,8 @@ The following are explicitly out of scope for this thesis:
   up, evaluates it, and reports the oversights found while testing in
   @sec:pcb-impact-summary, but does not redesign it.
 - Modifications to the AI-MotionLab itself, including its OptiTrack setup
-  and the PySide testsuite application beyond the firmware-facing
-  communication path described in @ch:integration.
+  and the PySide testsuite application beyond the telemetry and parameter
+  fields added for the firmware integration described in @ch:integration.
 
 == Thesis Structure <sec:thesis-structure>
 
@@ -148,9 +148,9 @@ during this work. @ch:firmware-sensors and @ch:firmware-state-machine cover
 the firmware itself, application structure, sensor drivers, and actuator
 control in the former, and the driving state machine, its flag-based event
 mechanism, and the turn detection algorithm in the latter.
-@ch:integration explains how that firmware connects to the AI-MotionLab
-testsuite from the firmware side, the telemetry and parameter fields it
-exposes and the text commands it answers, describing the testsuite itself
+@ch:integration explains how that firmware uses the existing communication
+infrastructure to connect to the AI-MotionLab testsuite, including the
+telemetry and parameter fields it exposes, describing the testsuite itself
 only as far as needed for that context. @ch:evaluation reports on the
 platform's sensor performance, state machine and turn detection behavior,
 and the usability of the tuning workflow, including the impact of the
