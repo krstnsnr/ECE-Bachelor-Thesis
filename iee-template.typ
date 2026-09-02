@@ -390,7 +390,7 @@ long }
           let fig-num = cap.counter.at(it.element.location()).first()
           let num = numbering("1.1", chapter-num, fig-num)
           block(
-            link(it.element.location(), text(fill: black)[*#cap.supplement #num:* #cap.body #if fill != none { box(width: 1fr, fill) } else { h(1fr) } #pg])
+            link(it.element.location(), text(fill: black)[#in-outline.update(true)*#cap.supplement #num:* #cap.body #in-outline.update(false)#if fill != none { box(width: 1fr, fill) } else { h(1fr) } #pg])
           )
         }
       } else {

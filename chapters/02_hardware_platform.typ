@@ -1,103 +1,73 @@
 #import "/helpers/gls.typ": gls, glspl
+#import "/helpers/lib.typ": imgsrc
 
 = Hardware Platform <ch:hardware>
 
 == Chassis: XRAY M18 Pro LiPo 4WD <sec:chassis>
 
-The chassis this thesis's hardware baseline builds on is the XRAY M18 Pro
+The hardware of this thesis builds on is the XRAY M18 Pro
 LiPo, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from XRAY
-@MichaelsRCXRAYM18Pro2026. It measures 220mm long on a 150mm wheelbase and
-weighs about 165g standalone. The main chassis plate is #gls("cnc")-machined
+@MichaelsRCXRAYM18Pro2026. It measures 220mm in length with a wheelbase of 150mm and
+a weight of approximately 165g. The main chassis plate is #gls("cnc")-machined
 from 1.6mm carbon fiber, thin enough to flex a little on a low-grip
-surface but stiff enough to hold its line at speed. XRAY's Multi-Flex
-Technology top deck lets that flex be tuned separately at the front and
+surface but stiff enough to hold its line at higher speeds. XRAY's Multi-Flex
+top deck enables that flex to be tuned separately at the front and
 rear axle, a feature carried over from XRAY's 1/10-scale touring cars.
 
-Two things about the M18 Pro matter for how CrazyCar uses it. First, its
-drivetrain and suspension are fully adjustable, with composite ball
-differentials at both axles, a 1:2.5 drive ratio with swappable 36T and
-42T spur gears and assorted pinions, and coil-over shocks with adjustable
-camber, caster, and toe. That range covers everything from a fast,
-predictable setup on a smooth indoor track to a looser one that tolerates
-a rougher surface. Second, the kit ships bare. Radio, servo, #gls("esc"),
-motor, and battery are not included. The electronics have to be built up from
-scratch, which is exactly the gap this thesis's firmware and this
-platform's #gls("pcb"), covered in @sec:main-pcb, fill. Being a widely sold competition kit
-also means worn or crashed parts are easy to source and replace, which
-matters when a fleet of these cars is driven by students.
+Two characteristics of the M18 Pro are relevant to its use in CrazyCar. First, the
+drivetrain and suspension are fully adjustable. The setup additionally offers composite ball
+differentials at both axles, a 1:2.5 drive ratio with changeable 36T and
+42T spur gears and a range of pinions, and coil-over shocks with adjustable
+camber, caster, and toe. That range covers setups from fast and predictable on smooth indoor surfaces to more compliant configurations for rougher tracks. Second, the kit is available standalone. That bare state leaves room to build a
+fully custom electronics platform, exactly what this project set out to do.
+
 
 #figure(
   image("/assets/pictures/XRAY_M18_Pro_LiPo.jpg", width: 40%),
-  caption: [XRAY M18 Pro LiPo 4WD chassis],
+  caption: [XRAY M18 Pro LiPo 4WD chassis #imgsrc(<MKRacingXRAYM18Pro2026>)],
 ) <fig:chassis>
-#align(center, text(size: 9pt, style: "italic")[Image source: @MKRacingXRAYM18Pro2026])
 
 == Main PCB (XRay Legacy V1) <sec:main-pcb>
 
-Everything in this chapter bolts onto one custom #gls("pcb"), designed
-in-house by A. Läßer specifically for this STM32-based generation of
-CrazyCar @LaesserXRayLegacy2023. It is the board that ties the rest of
-the platform together. The #gls("i2c") sensor stack, the motor and
-steering drivers, the ADC, and the ESP8266 WiFi bridge all mount
-to it, alongside the Nucleo board carrying the STM32H533RE itself.
-This thesis's firmware runs on that PCB, and this thesis is also the
-first to bring the board up and evaluate it. @sec:pcb-impact-summary
-reports the oversights that surfaced during that evaluation.
+The components described in this chapter are mounted on a custom PCB, designed in-house by A. Läßer for this STM32-based generation of CrazyCar @LaesserXRayLegacy2023. 
+ The board carries the #gls("i2c") sensor stack, the motor and steering drivers, the ADC, and the ESP8266 WiFi bridge, together with the Nucleo board holding the STM32H533RE, which acts as the central platform.
+This thesis is the first work to put this very version of the board into operation and to evaluate it under load. The design oversights identified in the process are reported in @sec:pcb-impact-summary.
 
 #figure(
   image("/assets/pictures/XRayLegacy_PCB_TopView.png", width: 70%),
-  caption: [XRay Legacy V1 PCB, top view],
+  caption: [XRay Legacy V1 PCB, top view #imgsrc(<LaesserXRayLegacy2023>)],
 ) <fig:main-pcb>
-#align(center, text(size: 9pt, style: "italic")[Image source: @LaesserXRayLegacy2023])
 
 == Microcontroller: STM32H533RE (Nucleo-H533RE) <sec:mcu>
 
-This thesis's firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
+The firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
 development board carrying an STM32H533RET6 microcontroller
-@UM3121_2025. That microcontroller choice came with the #gls("pcb")
-introduced in @sec:main-pcb, and it turned out to be a good fit for the
-firmware built on top of it.
+@UM3121_2025. The choice of the microcontroller was determined according to the course "Embedded Systems" at it's  orientation of the future lab classes. It proved well suited to the requirements of the firmware as well.
 
 #figure(
   image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 70%),
-  caption: [STM32H5 Nucleo-64 board (MB1814), top and bottom layout],
+  caption: [STM32H5 Nucleo-64 board (MB1814), top and bottom layout #imgsrc(<UM3121_2025>)],
 ) <fig:nucleo-board>
-#align(center, text(size: 9pt, style: "italic")[Image source: @UM3121_2025])
 
-The STM32H533RE is built around an Arm Cortex-M33 core with a hardware
-#gls("fpu"), clocked at up to 250 MHz @STM32H533xx2026. It has 512 Kbytes of
-flash and 272 Kbytes of #gls("sram"), more than this project's sensor drivers,
-control loop, state machine, and telemetry stack need, which leaves headroom
-for the firmware to grow. Its peripheral set fits the platform directly. The
-I2C buses host the ADS7128 #gls("adc"), the BNO055 #gls("imu"), and the
-VL53L1X distance sensors, a #gls("usart") carries the ESP8266 WiFi bridge
-traffic, and the #gls("pwm") timers drive the motor and steering actuators.
-The firmware side of both is covered in @sec:i2c-stack and
-@sec:actuator-control.
+The STM32H533RE is based on an Arm Cortex-M33 core with a hardware floating-point unit, clocked at up to 250 MHz @STM32H533xx2026. It provides 512 KB of flash and 272 KB of #gls("sram"). This exceeds the requirements of the sensor drivers, control loop, state machine, and telemetry stack implemented here, leaving headroom for future extensions.
+The #gls("i2c") buses connect the ADS7128 ADC, the BNO055 IMU, and the VL53L1X distance sensors. A #gls("usart") carries the traffic of the ESP8266 WiFi bridge, and the #gls("pwm") timers drive the motor and steering actuators. The corresponding firmware implementation is described in @sec:i2c-stack and @sec:actuator-control.
 
-The Nucleo-64 board adds what is needed to develop right away, an on-board
-STLINK-V3EC debugger and programmer, headers that expose the STM32's I/O for
-bring-up wiring, and ST's STM32CubeMX and STM32CubeIDE toolchain for generating
-peripheral initialization code @STM32CubeMX2026.
+The Nucleo-64 board provides the infrastructure required for development, including an on-board STLINK-V3EC debugger and programmer, headers exposing the I/O of the STM32 for test wiring, and support for the STM32CubeMX and STM32CubeIDE toolchain used to generate the peripheral initialisation code @STM32CubeMX2026.
 
-One STM32H5 feature matters beyond raw specs. The series includes a
-#gls("rom") system memory bootloader that this thesis's over-the-air update path
-uses to reflash the car over WiFi, without setting aside any of the
-512 Kbytes of flash for a bootloader of its own, as @ch:integration details.
+One feature of theSTM32H5 series is relevant beyond these specifications. The series includes a
+#gls("rom") system memory bootloader, which the over-the-air update mechanism of this thesis uses to reflash the vehicle over WiFi.
 
 == Sensor Suite <sec:sensors>
 
 === Time-of-Flight Distance Sensors (VL53L1X) <sec:tof>
 
-Each of the three distance sensors on the platform is an ST VL53L1X, a
-#gls("tof") laser-ranging module from ST's FlightSense family
-@VL53L1X2024. A conventional IR proximity sensor infers distance from the
-intensity of reflected infrared light. The VL53L1X instead times how long
-a 940nm laser pulse takes to travel to a target and back, using a
-#gls("spad") receiving array sensitive enough to register individual
-returning photons. That timing-based principle makes the reported
+The platform uses three ST VL53L1X, a
+#gls("tof") laser-ranging modules from the FlightSense family
+@VL53L1X2024. 
+Unlike conventional infrared proximity sensors, which derive distance from the intensity of the reflected light, the VL53L1X measures the time a 940 nm laser pulse requires to travel to the target and back. The returning photons are detected by a #gls("spad") receiving array sensitive enough to register individual photons.
+That timing-based principle makes the reported
 distance largely independent of the target's color or reflectance, which
-matters on a track where the car has to range off wood barriers reliably.
+matters on a track where the car measures its distance to wooden barriers..
 
 #figure(
   grid(
@@ -107,45 +77,35 @@ matters on a track where the car has to range off wood barriers reliably.
     image("/assets/pictures/VL53L1X_Pimoroni_Breakout.jpg", width: 60%),
     image("/assets/pictures/VL53L1X_Pimoroni_Breakout_Back.jpg", width: 60%),
   ),
-  caption: [VL53L1X distance sensor, Pimoroni breakout board, front and back.],
+  caption: [VL53L1X distance sensor, Pimoroni breakout board, front and back #imgsrc(<PimoroniVL53L1XBreakout2026>)],
 ) <fig:tof-sensor>
-#align(center, text(size: 9pt, style: "italic")[Image source: @PimoroniVL53L1XBreakout2026])
 
-Each of the three sensors sits on a Pimoroni breakout board, shown in
-@fig:tof-sensor, and talks over #gls("i2c") at up to 400kHz. Every VL53L1X
-boots at the same fixed address, so the three cannot simply share one bus. Each sensor
-also has an active-low XSHUT pin that forces it into standby, and the firmware
-uses those pins to bring the sensors up one at a time and give each its own
-address at startup, a sequence @sec:i2c-stack walks through.
+Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address, so the three sensors cannot share a single bus without further measures. Each sensor provides an active-low XSHUT pin that holds it in standby. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
 
 Ranging is tuned through three settings. The distance mode trades range against
 immunity to ambient light, reaching up to 3.6m in the dark in long mode but
-around 1.35m in short mode regardless of lighting. The timing budget sets how
-long a measurement takes, trading range and repeatability against ranging rate.
+around 1.35m in short mode regardless of lighting conditions. The timing budget defines the 
+duration of a measurement, trading range and repeatability against the ranging rate.
 The #gls("roi") restricts the active part of the 16x16 #gls("spad") array,
-which narrows the diagonal #gls("fov") from 27 degrees down to as little as 15.
-The three sensors use these differently. The front sensor runs in long mode
+which narrows the diagonal #gls("fov") from 27° down to as little as 15°.
+The front sensor operates in long mode
 with a narrow 4x4 #gls("roi") to keep its #gls("fov") tight on the track ahead,
-while the left and right sensors run in short mode with a wider 10x10
+while the left and right sensors operate in short mode with a wider 10x10
 #gls("roi") to pick up a nearby wall.
 
 === IMU (BNO055) <sec:imu>
 
-The platform's #gls("imu") is a Bosch Sensortec BNO055, a single package
-that combines a triaxial 14-bit accelerometer, a triaxial 16-bit
-gyroscope rated to 2000 degrees per second, a triaxial magnetometer, and
-a 32-bit Cortex-M0+ microcontroller running Bosch's own sensor fusion
-firmware @BNO0552021. Rather than handing raw accelerometer, gyroscope,
+The #gls("imu") of the platform is a Bosch Sensortec BNO055. The device combines a triaxial 14-bit accelerometer, a triaxial 16-bit gyroscope rated up to 2000 °/s, a triaxial magnetometer, and a 32-bit Cortex-M0+ microcontroller running the sensor fusion firmware provided by Bosch @BNO0552021.
+Rather than transmitting raw accelerometer, gyroscope,
 and magnetometer samples to the host, the BNO055 fuses them on-chip and
-reports ready-to-use orientation data over #gls("i2c"). That leaves the
+reports ready-to-use orientation data over #gls("i2c"). That sets the
 STM32 free to run its control loop and state machine instead of a
 fusion filter of its own.
 
 #figure(
   image("/assets/pictures/BNO055.png", width: 40%),
-  caption: [BNO055, 28-pin LGA package],
+  caption: [BNO055, 28-pin LGA package #imgsrc(<MouserBNO0552026>)],
 ) <fig:bno055>
-#align(center, text(size: 9pt, style: "italic")[Image source: @MouserBNO0552026])
 
 The BNO055 exposes both non-fusion modes, where individual sensors can
 be read raw, and fusion modes, where the on-chip algorithm combines
@@ -205,9 +165,8 @@ headroom than this platform ends up needing.
 
 #figure(
   image("/assets/pictures/ads7128.png", width: 50%),
-  caption: [ADS7128, WQFN-16 package],
+  caption: [ADS7128, WQFN-16 package #imgsrc(<TIADS7128ProductPage2026>)],
 ) <fig:ads7128>
-#align(center, text(size: 9pt, style: "italic")[Image source: @TIADS7128ProductPage2026])
 
 The ADS7128 answers to one of eight I2C addresses, selected by a pair
 of external resistors on its ADDR pin rather than a single
@@ -231,9 +190,8 @@ pulse per pole pair as the wheel turns.
     image("/assets/pictures/TLE4966L.png", width: 55%),
     image("/assets/pictures/RPM_Sensor_V2.0_Board.png", width: 65%),
   ),
-  caption: [TLE4966L, PG-SSO-4-1 package, and this platform's RPM sensor board carrying it],
+  caption: [TLE4966L, PG-SSO-4-1 package, and this platform's RPM sensor board carrying it #imgsrc(<InfineonTLE4966LProductPage2026>, <KrennRPMSensor2026>)],
 ) <fig:tle4966l>
-#align(center, text(size: 9pt, style: "italic")[Image sources: TLE4966L photo, @InfineonTLE4966LProductPage2026; RPM sensor board, @KrennRPMSensor2026])
 
 What sets the TLE4966L apart from a plain Hall switch is a second
 output pin that reports rotation direction alongside the speed pulse.
@@ -250,9 +208,8 @@ in one automotive-qualified package.
 
 #figure(
   image("/assets/pictures/btn9970lv.jpg", width: 45%),
-  caption: [BTN9970LV, PG-HSOF-7 package],
+  caption: [BTN9970LV, PG-HSOF-7 package #imgsrc(<Rutronik24BTN9970LV2026>)],
 ) <fig:btn9970lv>
-#align(center, text(size: 9pt, style: "italic")[Image source: @Rutronik24BTN9970LV2026])
 
 Each driver takes two digital inputs. IN selects which side of the
 half-bridge conducts, fast enough to be driven straight from a #gls("pwm")
@@ -282,9 +239,8 @@ to the car.
 
 #figure(
   image("/assets/pictures/D1_Mini_TopDown.jpg", width: 30%),
-  caption: [AZ-Delivery D1 mini, top-down view],
+  caption: [AZ-Delivery D1 mini, top-down view #imgsrc(<AZDeliveryD1Mini2026>)],
 ) <fig:d1-mini>
-#align(center, text(size: 9pt, style: "italic")[Image source: @AZDeliveryD1Mini2026])
 
 This platform's firmware treats that link as a plain byte pipe. It
 writes bytes to the USART and reads bytes back over #gls("dma"), with

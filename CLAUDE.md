@@ -287,16 +287,23 @@ the colleague's.
 - Declarations (`Eidesstattliche Erklärung` / `Declaration of Honor`) are
   legally required honor statements for FH JOANNEUM submissions; don't
   reword their content casually.
-- **Never put a `@citation` inside a `figure(caption: [...])`.** The List of
-  Figures outline entry (`show outline.entry.where(level: 1)` in
-  `iee-template.typ`, around the `#cap.body` line) re-renders the full
-  caption body, and that list sits in the frontmatter before chapter 1. A
-  citation embedded in a caption gets "seen" there first and grabs a lower
-  IEEE reference number than citations that appear earlier in the actual
-  chapter text, which is confusing to a reader. Put image/source credits in
-  a separate line under the figure instead, for example
-  `#align(center, text(size: 9pt, style: "italic")[Image source: @key])`,
-  as done for `@fig:chassis` in `sec:chassis`.
+- **Image source citations live inside the figure caption**, appended via
+  `#imgsrc(<key>)` (or `#imgsrc(<key1>, <key2>)` for more than one source),
+  for example `caption: [XRAY M18 Pro LiPo 4WD chassis
+  #imgsrc(<MKRacingXRAYM18Pro2026>)]` as done for `@fig:chassis` in
+  `sec:chassis`. This renders as "Figure 2.1: XRAY M18 Pro LiPo 4WD chassis
+  [5]." Import it per chapter with
+  `#import "/helpers/lib.typ": imgsrc`, the same per-file import rule as
+  `#gls`/`#glspl`. Don't call `@key`/`#cite(<key>)` directly inside a
+  caption; the List of Figures outline entry
+  (`show outline.entry.where(level: 1)` in `iee-template.typ`) re-renders
+  the full caption body in the frontmatter before chapter 1, and a citation
+  seen there first would grab a lower IEEE reference number than citations
+  appearing earlier in the actual chapter text. `imgsrc` (in
+  `helpers/lib.typ`) avoids this by checking the shared `in-outline` state
+  (set around the `#cap.body` re-render in `iee-template.typ`) and
+  suppressing the citation when rendering inside that outline, so citation
+  numbering follows first appearance in the chapter text.
 
 ## Writing Style
 

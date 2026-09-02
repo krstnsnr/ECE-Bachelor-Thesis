@@ -3,6 +3,18 @@
 #import "@preview/zap:0.5.0"
 #import "@preview/circuiteria:0.2.0"
 #import "@preview/chronos:0.3.0"
+#import "/iee-template.typ": in-outline
+
+// Source citation(s) for a figure, appended inside its caption
+// (e.g. "Figure 2.1: XRAY M18 Pro LiPo 4WD chassis [5]."). Suppressed when
+// Typst re-renders the caption body in the List of Figures front matter, so
+// citation numbering follows first appearance in the chapter text rather
+// than the front-matter listing order.
+#let imgsrc(..keys) = context {
+  if in-outline.get() { [] } else {
+    keys.pos().map(k => cite(k)).join(", ")
+  }
+}
 
 // --- Helper: Blue Box (mdframed equivalent) ---
 
