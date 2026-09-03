@@ -4,174 +4,178 @@
 
 == Application Structure Overview <sec:app-structure>
 
-The firmware's entry point does two things. It runs a fixed
-initialization sequence once, then drops into an infinite loop for
-the rest of the car's runtime. Initialization first brings up the
-STM32's own peripherals (clocks, DMA, I2C, timers, USART), then each
-application module in turn, the ESP8266 link, OTA protocol, servo and
-motor outputs, the display, the ToF sensors, the start/stop button,
-the ADC, the Hall sensor, and the IMU last. 
+The entry point of the firmware executes a fixed initialization
+sequence once and then enters an infinite loop that runs for the
+remaining runtime of the car. Initialization covers the STM32
+peripherals first, namely clocks, DMA, I2C, timers, and USART. The
+application modules follow in a fixed order, starting with the ESP8266
+link and the OTA protocol, then the servo and motor outputs, the
+display, the ToF sensors, the start/stop button, the ADC, the Hall
+sensor, and the IMU last.
 
-The main loop itself is lean and does not pace itself with a blocking
-delay. Every pass it toggles a debug pin, processes any pending OTA
-traffic, and lets the state machine check whether the start or stop
-button has just been pressed. Actual timing comes from a hardware
-timer instead. A 100 Hz timer interrupt sets a pending flag on every
-tick, and the loop's control step only does its work when that flag
-is set. That keeps OTA handling and button response running every
-pass, uninterrupted by whatever the control step is doing, while
-still giving the control step itself a fixed 100 Hz rate.
+Timing in the main loop comes from a hardware timer rather than from a
+blocking delay. On every pass the loop toggles a debug pin, processes
+pending OTA traffic, and passes the start and stop button state to the
+state machine. A 100 Hz timer interrupt sets a pending flag on every
+tick, and the control step of the loop executes when that flag is set.
+OTA handling and button response therefore run on every pass,
+independently of the control step, while the control step keeps a
+fixed 100 Hz rate.
 
 #figure(
   image("/assets/graphics/selfdrawn/system_diagram.svg", width: 100%),
   caption: [Application architecture: sensor inputs, telemetry globals, state machine, and actuator outputs],
 ) <fig:system-diagram>
 
-@fig:system-diagram shows how a single control step is
-structured. Every ToF sensor, the IMU, the Hall speed sensor, and the
-ADC all write into one shared set of telemetry globals, alongside the
-start/stop button and the wireless bridge. Reads happen at different rates depending on the
-signal. The IMU and Hall sensor are read every 100 Hz tick, the front
-ToF sensor at about 30 Hz and the side sensors at 50 Hz, and the ADC
-itself splits across two rates, battery voltage at 2 Hz and motor
-current at a faster 50 Hz. That current reading only ever comes from
-whichever motor driver is currently doing the driving. Its channel
-is read every 50 Hz sample for as long as the commanded direction
-stays the same, while the idle side is not sampled at all, since its
-current-sense output is not a valid reading while it is
-not driving, as @sec:motor-drivers explains. The state machine reads that same
-telemetry each 100 Hz tick and drives two
-PID controllers, one for motor speed and one for steering,
-which in turn set the ESC and servo outputs, covered in @sec:actuator-control.
+@fig:system-diagram shows the structure of a single control step. The
+ToF sensors, the IMU, the Hall speed sensor, and the ADC write into
+one shared set of telemetry globals, together with the start/stop
+button and the wireless bridge. Each signal is sampled at its own
+rate. The IMU and the Hall sensor are read on every 100 Hz tick, the
+front ToF sensor at approximately 30 Hz, and the side ToF sensors at
+50 Hz. The ADC uses two rates, 2 Hz for the battery voltage and 50 Hz
+for the motor current.
 
-Splitting the firmware this way keeps each module narrow and follows the
-sensor, controller, and actuator layering common to embedded robotics
-platforms @Braunl2008. Sensor
-drivers, described in @sec:sensor-drivers, only know how to talk to their own chip.
-The telemetry globals are just data, readable and writable by name so
-the OTA link can expose them to the AI-MotionLab testsuite without
-every module needing its own protocol code. The state machine only
-reads and writes that shared data, never talking to a driver or an
-actuator directly.
+The motor current is read from one driver at a time. The channel of
+the active driver is sampled at 50 Hz for as long as the commanded
+direction stays the same. The idle driver is skipped, since its
+current-sense output is valid only while it drives.
+@sec:motor-drivers describes this behavior.
+
+The state machine reads the same telemetry on every 100 Hz tick and
+drives two PID controllers, one for motor speed and one for steering.
+These set the #gls("esc") and servo outputs.
+@sec:actuator-control describes the actuation path.
+
+This structure follows the sensor, controller, and actuator layering
+common to embedded robotics platforms @Braunl2008. Each sensor driver,
+described in @sec:sensor-drivers, addresses only its own device. The
+telemetry globals hold plain data, readable and writable by name, so
+the OTA link exposes them to the AI-MotionLab testsuite without
+protocol code in every module. The state machine operates on that
+shared data alone and accesses no driver or actuator directly.
 
 == Sensor Drivers and Data Acquisition <sec:sensor-drivers>
 === I2C Sensor Stack Integration and Address Assignment at Startup <sec:i2c-stack>
 
-Five I2C devices, three ToF sensors, the ADC, and the IMU, share the
-STM32's single I2C1 bus introduced in @sec:mcu. Each has to be reachable at its
-own address before its driver can be used. @fig:i2c-startup shows the
-order this happens in during boot and the address each device ends up
-at.
+Five I2C devices, namely the three ToF sensors, the ADC, and the IMU,
+share the single I2C1 bus of the STM32 introduced in @sec:mcu. Each
+device must be reachable at its own address before its driver can be
+used. @fig:i2c-startup shows the startup order and the address
+assigned to each device.
 
 #figure(
   image("/assets/graphics/selfdrawn/i2c_startup_sequence.svg", width: 75%),
   caption: [I2C1 startup sequence and address assignment],
 ) <fig:i2c-startup>
 
-The three ToF sensors are the reason this has to be a sequence at
-all. Every VL53L1X boots at the same fixed address, as noted in @sec:tof, so
-this platform's firmware holds all three in hardware standby and
-brings them up one at a time, each getting reassigned to its own 8-bit
-address (0x30, 0x32, 0x34) before the next is released. Only once all
-three have a unique address does ranging start on any of them.
+The three ToF sensors make this sequence necessary. As noted in
+@sec:tof, every VL53L1X starts up at the same fixed address. The
+firmware therefore holds all three in hardware standby and activates
+them one at a time. Each sensor is reassigned to its own 8-bit
+address, 0x30, 0x32, and 0x34, before the next one is released.
+Ranging starts only after all three have a unique address.
 
-The ADC and IMU need no such dance. The ADS7128's address is set in
-hardware by a resistor on its ADDR pin, as @sec:adc describes, tied on this
-platform to give address 0x20, and the BNO055's by the level on its
-COM3 pin, as @sec:imu describes. Both are already unique by the time their init
-functions run, so each just confirms the device answers where it is
-expected to.
+The ADC and the IMU require no such sequence. The address of the
+ADS7128 is set in hardware by a resistor on its ADDR pin, as @sec:adc
+describes, and is tied on this platform to 0x20. The address of the
+BNO055 follows from the level on its COM3 pin, described in @sec:imu.
+Both addresses are unique before the initialization functions run, so
+each function only verifies that the device responds at the expected
+address.
 
 === ADC Channel Handling <sec:adc-handling>
 
-All register access goes through a two-byte command, an operation code
-followed by a register address. This platform's driver uses only two
-of the opcodes the datasheet defines, one for a single register write
-and one for a single register read. A finished 12-bit conversion
-result is read back MSB-justified across two bytes, the upper eight
-bits followed by the lower four bits padded with zeros, and the
-driver reassembles the two into a single 12-bit value with a shift
-and a combine.
+All register access uses a two-byte command, an operation code
+followed by a register address. The driver of this platform uses two
+of the opcodes defined in the datasheet, one for a single register
+write and one for a single register read. A completed 12-bit
+conversion result is read back #gls("msb")-justified across two bytes,
+the upper eight bits followed by the lower four bits padded with
+zeros. The driver reassembles them into a single 12-bit value by
+shifting and combining the two bytes.
 
-The device powers up in manual mode, and this platform leaves it
-there instead of switching to auto-sequence or autonomous mode. In
-manual mode the host selects a channel with a register write instead
-of toggling the multiplexer directly, so this platform's driver
-writes the desired channel to the device's channel-select register
-before every conversion. It also enables 32x oversampling, the
-datasheet's built-in averaging filter, for extra settling time and
-noise reduction. After switching to a new channel, the driver reads
-it twice and discards the first conversion, so a stale sample left
-over from the previous channel is never mistaken for a valid one.
+The device powers up in manual mode, which this platform retains
+instead of the auto-sequence or autonomous modes. In manual mode the
+host selects a channel through a register write rather than by
+toggling the multiplexer directly. The driver therefore writes the
+required channel to the channel-select register of the device before
+every conversion. It also enables 32× oversampling, the built-in
+averaging filter of the ADS7128, which adds settling time and reduces
+noise. After a channel change the driver reads the channel twice and
+discards the first conversion, so that only a settled sample is used.
 
-This platform uses three of the eight channels. One reads the
-battery voltage through a 10kOhm/18kOhm divider. The other two read
-the negative and positive-side current-sense outputs of the
-BTN9970LV half-bridge motor drivers, described in @sec:motor-drivers, each
-converted from the driver's IS pin current to a voltage across a
-2kOhm sense resistor before the ADC channel sees it.
+This platform uses three of the eight channels. One channel reads the
+battery voltage through a 10 kΩ/18 kΩ divider. The other two read the
+negative and positive-side current-sense outputs of the BTN9970LV
+half-bridge motor drivers described in @sec:motor-drivers. The current
+on the IS pin of each driver is converted to a voltage across a
+2 kΩ sense resistor before it reaches the ADC channel.
 
-None of that raw handling reaches the rest of the firmware. On top
-of the channel-select and read functions, the driver exposes two
-purpose-built getters, `ADS7128_GetBatteryVoltage()` and
-`ADS7128_GetCurrent()`, each of which reads its channel, waits for a
-settled sample, and converts the result into a physical unit itself,
-volts for the battery and amps for motor current, using the divider
-and current-sense math already covered in @sec:motor-drivers.
-`control_loop.c` never touches a raw ADC code. It just calls the
-getter for whichever channel it needs, at the rates already shown in
-@fig:system-diagram, and writes the returned value straight into the
-matching telemetry global.
+The rest of the firmware works with physical units only. Above the
+channel-select and read functions, the driver exposes two getters,
+`ADS7128_GetBatteryVoltage()` and `ADS7128_GetCurrent()`. Each of them
+reads its channel, waits for a settled sample, and converts the result
+into a physical unit, volts for the battery and amperes for the motor
+current. The conversion uses the divider and current-sense relations
+described in @sec:motor-drivers. `control_loop.c` calls the getter for
+the channel it requires, at the rates shown in @fig:system-diagram,
+and writes the returned value into the matching telemetry global.
 
 == Actuator Control <sec:actuator-control>
 
-Both the steering and speed PID controllers that the state machine
-drives each 100 Hz tick, introduced in @sec:app-structure, share one implementation.
-A `PID_t` instance holds its own gains, an accumulated integral term,
-and the previous error, alongside output limits. Each call first
-computes the error as setpoint minus measurement. It then computes a
-proportional term from that error, an integral term accumulated over
-time and clamped to a fixed fraction of the output range before
-being scaled by the integral gain, and a derivative term from the
-change in error since the last call. The three terms are summed and
-the result is clamped to the controller's output range before it is
-returned. This is a standard parallel-form PID controller
-@SallokerRTEA. The clamped integral keeps it
-from winding up while the output is saturated, and the final output
-clamp keeps that saturated output within a range the actuator
-underneath it can actually use.
+@sec:app-structure introduces the two PID controllers that the state
+machine drives on every 100 Hz tick, one for steering and one for
+speed. Both share a single implementation. A `PID_t` instance holds
+its own gains, an accumulated integral term, and the previous error,
+together with the output limits.
 
-Starting gains for both controllers came from Skogestad's SIMC
-tuning rules @Skogestad2003, applied to step-response data captured
-on the platform itself. The resulting gains are stored as
-plain writable telemetry fields.
-`state_machine.c` reloads them into its PID instances at the start
-of every tick, so a gain written from the AI-MotionLab testsuite
-over the OTA link takes effect on the next control step, without a
-rebuild or a reflash. The gains in the firmware today reflect that
-live tuning on top of the original SIMC starting point.
+Each call first computes the error as setpoint minus measurement. The
+proportional term follows from that error. The integral term
+accumulates over time and is clamped to a fixed fraction of the output
+range before it is scaled by the integral gain. The derivative term
+follows from the change in error since the last call. The three terms
+are summed, and the result is clamped to the output range of the
+controller before it is returned.
 
-The speed PID's output drives the motor through `Motor_SetSpeed()`.
-The two BTN9970LV half-bridges that make up the drive motor's
-H-bridge, covered in @sec:motor-drivers, each take an IN pin, which selects
-which side of that half-bridge switches on, and an INH pin, which
-enables it or tristates it entirely. This platform sets each IC's IN
-pin to a fixed level for the duration of a direction, IN1 high for
-forward and IN2 high for reverse, with the two ICs always getting
-opposite levels so one motor terminal is pulled high while the other
-is pulled low. A single shared PWM signal drives both ICs' INH pins
-together, and its duty cycle comes directly from the PID output's
-magnitude. Every cycle enables both halves of the bridge for the
-high part of that duty cycle, then tristates both of them for the
-rest, so the motor coasts briefly during every off interval instead
-of being actively braked. Setting both IN pins to the same level, or
-holding the shared INH low, stops the motor.
+This is a standard parallel-form PID controller @SallokerRTEA. The
+clamped integral prevents windup while the output is saturated, and
+the final output clamp restricts the result to the range the actuator
+can accept.
 
-The steering PID's output goes through a calibration step
-instead of a direct mapping. `Set_Steering()` takes a command in the
-range -100 to 100, clamps it to that range, and linearly interpolates
-between three measured pulse widths, 1200 µs at full left, 1480 µs at
-center, and 1800 µs at full right, rather than assuming a symmetric
-range around center. The result is clamped a second time, to a wider
-500 µs to 2500 µs hardware safety range, immediately before it is
-written to the timer register that drives the steering servo.
+The starting gains for both controllers came from Skogestad's SIMC
+tuning rules @Skogestad2003, applied to step-response data captured on
+the platform. The resulting gains are stored as writable telemetry
+fields. `state_machine.c` reloads them into its PID instances at the
+start of every tick. A gain written from the AI-MotionLab testsuite
+over the OTA link therefore takes effect on the next control step,
+without a rebuild or a reflash. The gains in the current firmware
+result from this live tuning, starting from the SIMC values.
+
+The output of the speed PID drives the motor through
+`Motor_SetSpeed()`. Two BTN9970LV half-bridges form the H-bridge of
+the drive motor, as @sec:motor-drivers describes. Each one takes an IN
+pin, which selects the conducting side, and an INH pin, which enables
+the device or sets it to high impedance.
+
+This platform holds the IN pin of each IC at a fixed level for the
+duration of a direction, IN1 high for forward and IN2 high for
+reverse. The two ICs always receive opposite levels, so one motor
+terminal is pulled high while the other is pulled low. A single shared
+PWM signal drives the INH pins of both ICs together, and its duty
+cycle follows from the magnitude of the PID output. Each cycle enables
+both halves of the bridge for the high part of the duty cycle and sets
+both to high impedance for the remainder. The motor therefore coasts
+during every off interval rather than being actively braked. Setting
+both IN pins to the same level, or holding the shared INH low, stops
+the motor.
+
+The output of the steering PID passes through a calibration step
+rather than a direct mapping. `Set_Steering()` takes a command in the
+range from -100 to 100 and clamps it to that range. It then
+interpolates linearly between three measured pulse widths, 1200 µs at
+full left, 1480 µs at center, and 1800 µs at full right, which
+accounts for the asymmetry of the servo range around center. The
+result is clamped a second time to the wider hardware safety range
+from 500 µs to 2500 µs, immediately before it is written to the timer
+register that drives the steering servo.

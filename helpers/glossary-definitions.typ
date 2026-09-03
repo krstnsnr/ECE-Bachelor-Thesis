@@ -92,6 +92,9 @@
       key: "lsb", short: "LSB", long: "Least Significant Bit", description: [Smallest increment a register represents.],
     ),
     (
+      key: "msb", short: "MSB", long: "Most Significant Bit", description: [Highest-weight bit of a value.],
+    ),
+    (
       key: "sar", short: "SAR", long: "Successive Approximation Register", description: [ADC resolving one bit per step.],
     ),
     (
