@@ -93,6 +93,41 @@ the results in @ch:evaluation say how the platform performs on that layout
 rather than across corner geometries or track surfaces the platform has not
 yet been driven on.
 
+== Recommendations for the Next PCB Revision <sec:pcb-recommendations>
+
+The oversights reported in @sec:pcb-impact-summary translate directly into
+changes for the next revision of the main PCB.
+
+The charging circuit from @sec:pcb-battery-charging should be redesigned
+around the two-cell 18650 Li-Ion pack that the platform now runs on. Its
+charge voltage and current profile have to match Li-Ion cells rather than the
+original six-cell NiMH pack.
+
+The SDA/SCL swap from @sec:pcb-sda-scl is a straightforward layout fix. The
+next revision only needs to route those two traces to their correct pins on
+the BNO055, so that the sensor starts up correctly without a solder bridge.
+
+The next PCB revision should give the ESP8266 module a dedicated on-board
+footprint. A jumper should still be able to disconnect the STM32-ESP8266 bus
+entirely, because the Crazy Car race rules forbid wireless communication
+during a race. The link serves testing and tuning rather than competition
+runs.
+
+A pulldown resistor on D6 should also be added, so that the INH input from
+@sec:pcb-esc-pulldown starts low and holds the motor disabled until the
+firmware enables it.
+
+The pin layout from @sec:pcb-pin-layout requires a broader revision. Mounting
+the Nucleo board right side up would let it fit better under the cover of the
+car. The main PCB currently exposes only the Arduino Uno R4 header set, and
+the ST Morpho headers of the Nucleo board, which break out the remaining pins
+of the STM32, should be connected as well. The Hall sensor connector carries
+four pins, but only three of them reach the STM32. The wheel-speed sensor
+from @sec:hall is a four-pin part that also reports direction, so the
+connector should break out all four. The ESP8266 link should also stay off
+the pins outside that Arduino header footprint, since routing it there
+forfeits access to the extra pins of the Nucleo board without any benefit.
+
 == Lessons Learned <sec:lessons-learned>
 
 Bringing up the main PCB firsthand, described in @sec:crazycar-history and

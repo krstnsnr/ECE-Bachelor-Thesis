@@ -32,7 +32,7 @@ ToF sensors, the IMU, the Hall speed sensor, and the ADC write into
 one shared set of telemetry globals, together with the start/stop
 button and the wireless bridge. Each signal is sampled at its own
 rate. The IMU and the Hall sensor are read on every 100 Hz tick, the
-front ToF sensor at approximately 30 Hz, and the side ToF sensors at
+front ToF sensor at 33 Hz, and the side ToF sensors at
 50 Hz. The ADC uses two rates, 2 Hz for the battery voltage and 50 Hz
 for the motor current.
 

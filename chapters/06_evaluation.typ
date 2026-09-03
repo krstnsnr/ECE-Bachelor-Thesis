@@ -2,128 +2,125 @@
 
 == Evaluation Methodology <sec:eval-methodology>
 
-The firmware was evaluated through on-track runs in the AI-MotionLab, driving
-the autonomous loop over the manually defined circuit described in
-@sec:testsuite-architecture. Each run streamed telemetry back through the
-GET/SET protocol, and the testsuite's session logs captured that telemetry
-alongside the car's tracked position for later review.
+The firmware was evaluated in on-track runs in the AI-MotionLab. Each run
+drove the autonomous loop over the manually defined circuit described in
+@sec:ai-motionlab-role. Telemetry streamed back through the GET/SET protocol
+during every run, and the session logs of the testsuite captured it alongside
+the tracked position of the car for later review.
 
 The evaluation is qualitative. Sensor readings were judged by inspecting the
-logged telemetry for stable, plausible values, so @sec:sensor-performance
-reports behavior observed in these logs. Turn detection and state machine
-behavior were assessed the same way, by watching repeated runs and noting
-where a corner was missed or falsely triggered. The tuning workflow's
-usability is judged against the wired-debugger reflash workflow that this
-project used before the GET/SET protocol was in place, the same baseline
-@ch:integration and @sec:workflow describe.
+logged telemetry for stable and plausible values. @sec:sensor-performance
+reports the behavior observed in these logs. Turn detection and state machine
+behavior were assessed in the same way, by observing repeated runs and noting
+where a corner was missed or falsely triggered. The usability of the tuning
+workflow was judged against the wired-debugger reflash cycle that this project
+used before the GET/SET protocol was in place. @sec:workflow describes the
+workflow that replaced it.
 
 == Sensor Performance <sec:sensor-performance>
 
-The front ToF sensor, running at about 30 Hz with its narrow 4 × 4 ROI, reached a
-maximum usable range of 2.9 m on the track. Within that range its readings
-were accurate and reliable throughout testing. The car sits low to the
-ground, and even the minimum 15° FoV that the 4 × 4 ROI gives it still
-catches ground reflections at longer range. Neither a longer timing budget
-nor a wider ROI changed this, so the limit comes from the sensor's mounting
-height rather than from its timing or ROI settings.
+The front ToF sensor, running at 33 Hz with its narrow 4 × 4 ROI, reached a
+maximum usable range of 2.9 m on the track. Within that range
+its readings were accurate and reliable throughout testing. The car has a low
+ride height, and even the minimum 15° FoV of the 4 × 4 ROI still receives
+ground reflections at longer range. A longer timing budget and a wider ROI
+both left this limit unchanged, so it follows from the mounting height of the
+sensor rather than from its timing or ROI settings.
 
-The side ToF sensors never have to range that far, and they performed well
-throughout testing. Their 10 × 10 ROI, the same short-mode setting @sec:tof
-describes and well short of the sensor's full 16 × 16 SPAD array, kept the
-corner-slope detection from @sec:turn-rate-threshold stable, and no further
-issues came up with either sensor.
+The side ToF sensors range over much shorter distances and performed well
+throughout testing. They use the 10 × 10 ROI of the short mode described in
+@sec:tof, which reads a subset of the full 16 × 16 SPAD array. The
+corner-slope detection from @sec:turn-rate-threshold remained stable on these
+readings, and neither sensor showed further issues.
 
-The IMU held a stable heading and yaw rate across all runs. The one drift that
-showed up was a small negative offset on the linear acceleration Z axis,
-resembling leftover gravity that the fusion algorithm's own accelerometer,
-gyroscope, and magnetometer inputs should already rule out. The X and Y
-linear acceleration axes stayed stable with no such offset, and the firmware
-never reads the Z axis, so the offset had no effect on driving.
+The IMU held a stable heading and yaw rate across all runs. The only deviation
+observed was a small negative offset on the linear acceleration Z axis. It
+resembles a residual gravity component, which the accelerometer, gyroscope,
+and magnetometer inputs of the fusion algorithm should already remove. The X
+and Y linear acceleration axes remained stable and showed no such offset. The
+firmware does not read the Z axis, so the offset had no effect on driving.
 
-The ADC readings, battery voltage and motor current alike, were accurate and
-stable for the whole evaluation.
+The ADC readings for battery voltage and motor current were accurate and
+stable throughout the evaluation.
 
 == State Machine / Turn Detection Performance <sec:turn-performance>
 
-Corner detection was reliable across the evaluation runs, catching both the
-90° corners and the 180° hairpins the exit grid in
-@sec:completion-criteria targets. The side ToF ROI changes described in
-@sec:sensor-performance shifted the sensors' readings enough that the slope
-threshold from @sec:turn-rate-threshold needed retuning alongside them, and
-once retuned, every corner on the track was detected cleanly.
+Corner detection was reliable across the evaluation runs. Both the 90° corners
+and the 180° hairpins targeted by the exit grid in @sec:completion-criteria
+were detected. The side ToF ROI changes reported in @sec:sensor-performance
+shifted the readings of the sensors. The slope threshold from
+@sec:turn-rate-threshold had to be retuned with them, and every corner on the
+track was detected after that retuning.
 
-`CAR_RECOVER`, introduced in @sec:flag-events, is the least refined of the
-driving states. Freeing a stuck car sometimes took two or three attempts
-rather than one, though the car worked itself free in most cases. Refining
-recovery further took a lower priority in this project, since the tuning
-workflow already repositions a car that fails a lap through
-`CAR_POINT_FOLLOW`, covered next, rather than depending on recovery to
-finish the lap itself.
+`CAR_RECOVER`, introduced in @sec:flag-events, was the least refined of the
+driving states. Freeing a stuck car sometimes took two or three attempts,
+although the car freed itself in most cases. Refining recovery further was
+given a lower priority, because the tuning workflow already repositions a car
+through `CAR_POINT_FOLLOW` when a lap fails, rather than relying on recovery
+to complete the lap.
 
 The two operator-driven modes from @sec:operator-modes both performed well.
-`CAR_REMOTE_CONTROL` worked without issue, since it only passes the
-operator's steering and speed setpoints straight through. `CAR_POINT_FOLLOW`
-also tracked its path well, with a small drift on the straight following a
-corner. The wheel-speed sensor from @sec:hall sits on a single rear wheel,
-so the dead-reckoned pose behind the pure-pursuit follower does not see the
+`CAR_REMOTE_CONTROL` operated without issue, since it passes the steering and
+speed setpoints of the operator through unchanged. `CAR_POINT_FOLLOW` also
+tracked its path well, with a small drift on the straight following a corner.
+The wheel-speed sensor from @sec:hall is mounted on a single rear wheel, so
+the dead-reckoned pose behind the pure-pursuit follower cannot account for the
 inner and outer rear wheels turning at different rates through a corner.
-Calibration removed most of this drift, but a small amount remained
-noticeable.
+Calibration removed most of this drift, but a small amount remained.
 
 == Usability of the Tuning Platform <sec:usability>
 
-Tuning against the wired-debugger reflash baseline from @sec:eval-methodology
-showed a clear qualitative improvement. Changing a PID gain no longer meant
-editing code, rebuilding, and reflashing over a wired connection between
-attempts. With the GET/SET workflow from @sec:pid-tuning, a gain change took
-effect on the next control step while the car kept driving, so its effect on
-the current lap was visible immediately. Chained across a session as
-@sec:workflow describes, this let a gain be adjusted, driven, and judged
-several times over in the time a single reflash cycle used to take, and the
-workflow held up without friction throughout the evaluation.
+Compared with the wired-debugger reflash baseline from @sec:eval-methodology,
+the tuning workflow showed a clear qualitative improvement. With the GET/SET
+workflow from @sec:pid-tuning, a gain change took effect on the next control
+step while the car kept driving, so its effect on the current lap was visible
+immediately. Repeated across a session, this allowed a gain to be adjusted,
+tested on track, and judged several times within the time that a single
+reflash cycle required. The workflow was used without difficulty throughout
+the evaluation.
 
-Changes to the state machine itself still need a rebuild and a flash, but
-even that step was faster over WiFi than the wired-debugger baseline. A wired
-reflash meant taking the car's cover off, connecting the debugger, closing
-the cover back up, and putting the car back on the track before the next run
+Changes to the state machine itself still require a rebuild and a flash, but
+even that step was faster over WiFi than in the wired-debugger baseline. A
+wired reflash meant removing the cover of the car, connecting the debugger,
+closing the cover, and placing the car back on the track before the next run
 could start. Sending the same build over the air, as @sec:workflow describes,
-skipped that whole routine, so even a firmware-logic iteration reached the
-track markedly faster than before.
+removed these steps, so even a firmware-logic iteration reached the track
+markedly faster.
 
 == Summary of PCB Oversight Impact on Testing <sec:pcb-impact-summary>
 
 === Battery Charging Circuit <sec:pcb-battery-charging>
 
-The main PCB from @sec:main-pcb carries an onboard charging circuit, fed
-through a USB-C connector, built for the six-cell NiMH battery pack that was
-standard on the platform when the board was designed. Partway through this
-project the platform moved to a self-built two-cell 18650 Li-Ion pack
-instead, for its higher capacity and longer run time and because its shape
-fits the chassis's battery compartment far better than the six-cell NiMH pack
-did. NiMH and Li-Ion cells need different charge voltages and currents, so
-the onboard circuit built for the old NiMH pack cannot charge the Li-Ion pack
-the platform now runs on, and charging has to happen off the car with an
-external charger instead.
+The main PCB from @sec:main-pcb carries an onboard charging circuit that is
+fed through a USB-C connector. The circuit was built for the six-cell NiMH
+battery pack that was standard on the platform when the board was designed.
+Partway through this project the platform moved to a self-built two-cell
+18650 Li-Ion pack. It offers a higher capacity and a longer run time, and its
+shape fits the battery compartment of the chassis far better than the
+six-cell NiMH pack. NiMH and Li-Ion cells require different charge voltages
+and currents, so the onboard circuit charges only the original NiMH pack. The
+Li-Ion pack that the platform now runs on is charged off the car with an
+external charger.
 
 === SDA/SCL Swap for the BNO055 <sec:pcb-sda-scl>
 
-On the main PCB, the BNO055's SDA and SCL lines to the shared I2C1 bus from
-@sec:i2c-stack are swapped, with each wired to the other signal's pin.
-Bringing up the sensor on the prototype board meant cutting both traces and
-bridging them back across with a short length of solder wire, restoring SDA
-and SCL to their correct pins so the IMU from @sec:imu could join the bus
-like the other I2C1 devices.
+On the main PCB, the SDA and SCL lines of the BNO055 to the shared I2C1 bus
+from @sec:i2c-stack are swapped, with each wired to the pin of the other
+signal. Bringing up the sensor on the prototype board therefore required
+cutting both traces and bridging them across with a short length of solder
+wire. This restored SDA and SCL to their correct pins, so the IMU from
+@sec:imu joined the bus in the same way as the other I2C1 devices.
 
 === Missing ESP8266-12F <sec:pcb-esp8266>
 
 The main PCB was laid out before wireless communication with the car was
-part of the plan, so it has no place for the WiFi bridge from
-@sec:esp-bridge. The need for one became clear once this thesis and
-Benedikt Polivka's thesis @PolivkaTestsuite2026 both called for it, this thesis for OTA
-updates and telemetry, his for the AI-MotionLab testsuite's live link to the
-car. The D1 mini board was added afterwards, wired directly into the Nucleo
-board's Arduino-style headers rather than fitted to a dedicated footprint on
-the main PCB.
+foreseen, so it provides no footprint for the WiFi bridge from
+@sec:esp-bridge. The need for such a bridge became clear once both this
+thesis and Benedikt Polivka's thesis @PolivkaTestsuite2026 required one. This
+thesis needed it for OTA updates and telemetry, and the testsuite needed it
+for its live link to the car. The D1 mini board was therefore added
+afterwards. It is wired directly into the Arduino-style headers of the Nucleo
+board rather than fitted to a dedicated footprint on the main PCB.
 
 === STM32 Pin Layout <sec:pcb-pin-layout>
 
@@ -144,35 +141,3 @@ during debugging. Flashing over the wired debugger in VS Code halts the STM32
 at reset by default, before `HAL_Init()` runs, and D6 floats in that pause,
 so the motor driver reads it as enabled and the motor starts turning with no
 code yet in control of it.
-
-=== Recommendations for the Next PCB Revision <sec:pcb-recommendations>
-
-The charging circuit from @sec:pcb-battery-charging should be redesigned
-around the 2S 18650 Li-Ion pack the platform now runs on, with a charge
-voltage and current profile that matches Li-Ion cells instead of the
-original six-cell NiMH pack.
-
-The SDA/SCL swap from @sec:pcb-sda-scl is a straightforward layout fix. The
-next revision only needs to route those two traces to their correct pins on
-the BNO055, so the sensor comes up correctly without a bodge wire.
-
-The next PCB revision should give the ESP8266 module a proper on-board
-place, still behind a jumper that can disconnect the STM32-ESP8266 bus
-entirely, since the Crazy Car race rules forbid wireless communication
-during the race itself and the link is meant for testing and tuning, not for
-the car's competition runs.
-
-A pulldown resistor on D6 belongs on the next revision too, so the INH input
-from @sec:pcb-esc-pulldown starts low and keeps the motor disabled until the
-firmware itself enables it.
-
-The pin layout deserves a broader revisit too. Mounting the Nucleo board
-right side up would let it sit better under the car's cover. The main PCB
-currently exposes only the Arduino Uno R4 header set, and the Nucleo board's
-ST Morpho headers, which break out the STM32's remaining pins, should be
-connected as well. The Hall sensor connector carries four pins, but
-only three of them reach the STM32, and the wheel-speed sensor from
-@sec:hall is a four-pin part that also reports direction, so the connector
-should break out all four. The ESP8266 link should also stay off the pins
-outside that Arduino header footprint, since routing it there gives up
-access to those extra pins on the Nucleo board without any benefit.
