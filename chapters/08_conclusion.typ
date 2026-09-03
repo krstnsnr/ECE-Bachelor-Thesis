@@ -21,7 +21,7 @@ delivered:
   sensor itself.
 - A finite state machine, covered in @ch:firmware-state-machine, that drives
   the car autonomously around the track, including a distance-normalized
-  turn detector that finds both the 90 degree corners and 180 degree
+  turn detector that finds both the 90° corners and 180°
   hairpins the track is built from, and two operator-driven modes for
   manual and path-following control.
 - Telemetry and parameter fields for the platform's sensors, driving state,

@@ -15,7 +15,7 @@ second part. And
 reflash cycle down to a live gain change, meeting the third.
 
 @sec:sensor-performance shows the sensor suite held up well enough to
-support that loop. The front ToF sensor's usable range plateaued at 2.9m,
+support that loop. The front ToF sensor's usable range plateaued at 2.9 m,
 but tracing that plateau to the sensor's mounting height rather than its
 timing budget or #gls("roi") settings means the sensor itself performed as
 its datasheet describes. The limit is a property of where the sensor sits
@@ -25,7 +25,7 @@ detector and state machine in @sec:turn-performance could rely on that data
 without extra filtering beyond what @sec:turn-rate-threshold and
 @sec:turn-preconditions already do.
 
-Reliable detection of both the 90 degree corners and the 180 degree
+Reliable detection of both the 90° corners and the 180°
 hairpins in @sec:turn-performance validates the distance-normalized slope
 approach from @sec:turn-rate-threshold. Keying the detector on distance
 traveled rather than elapsed time meant the same threshold worked whether
@@ -83,7 +83,7 @@ main PCB, exactly the workaround @sec:pcb-esp8266 describes, since the
 current board was laid out before wireless communication was part of the
 plan.
 
-The front ToF sensor's 2.9m range ceiling from @sec:sensor-performance is a
+The front ToF sensor's 2.9 m range ceiling from @sec:sensor-performance is a
 limitation of where the sensor sits on the car, not one firmware settings
 can tune away. As @sec:sensor-performance reports, neither a longer timing
 budget nor a wider #gls("roi") changed it. And the evaluation ran entirely

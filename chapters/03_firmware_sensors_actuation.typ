@@ -16,11 +16,11 @@ The main loop itself is lean and does not pace itself with a blocking
 delay. Every pass it toggles a debug pin, processes any pending OTA
 traffic, and lets the state machine check whether the start or stop
 button has just been pressed. Actual timing comes from a hardware
-timer instead. A 100Hz timer interrupt sets a pending flag on every
+timer instead. A 100 Hz timer interrupt sets a pending flag on every
 tick, and the loop's control step only does its work when that flag
 is set. That keeps OTA handling and button response running every
 pass, uninterrupted by whatever the control step is doing, while
-still giving the control step itself a fixed 100Hz rate.
+still giving the control step itself a fixed 100 Hz rate.
 
 #figure(
   image("/assets/graphics/selfdrawn/system_diagram.svg", width: 100%),
@@ -31,16 +31,16 @@ still giving the control step itself a fixed 100Hz rate.
 structured. Every ToF sensor, the IMU, the Hall speed sensor, and the
 ADC all write into one shared set of telemetry globals, alongside the
 start/stop button and the wireless bridge. Reads happen at different rates depending on the
-signal. The IMU and Hall sensor are read every 100Hz tick, the front
-ToF sensor at about 30Hz and the side sensors at 50Hz, and the ADC
-itself splits across two rates, battery voltage at 2Hz and motor
-current at a faster 50Hz. That current reading only ever comes from
+signal. The IMU and Hall sensor are read every 100 Hz tick, the front
+ToF sensor at about 30 Hz and the side sensors at 50 Hz, and the ADC
+itself splits across two rates, battery voltage at 2 Hz and motor
+current at a faster 50 Hz. That current reading only ever comes from
 whichever motor driver is currently doing the driving. Its channel
-is read every 50Hz sample for as long as the commanded direction
+is read every 50 Hz sample for as long as the commanded direction
 stays the same, while the idle side is not sampled at all, since its
 current-sense output is not a valid reading while it is
 not driving, as @sec:motor-drivers explains. The state machine reads that same
-telemetry each 100Hz tick and drives two
+telemetry each 100 Hz tick and drives two
 PID controllers, one for motor speed and one for steering,
 which in turn set the ESC and servo outputs, covered in @sec:actuator-control.
 
@@ -126,7 +126,7 @@ matching telemetry global.
 == Actuator Control <sec:actuator-control>
 
 Both the steering and speed PID controllers that the state machine
-drives each 100Hz tick, introduced in @sec:app-structure, share one implementation.
+drives each 100 Hz tick, introduced in @sec:app-structure, share one implementation.
 A `PID_t` instance holds its own gains, an accumulated integral term,
 and the previous error, alongside output limits. Each call first
 computes the error as setpoint minus measurement. It then computes a
@@ -170,8 +170,8 @@ holding the shared INH low, stops the motor.
 The steering PID's output goes through a calibration step
 instead of a direct mapping. `Set_Steering()` takes a command in the
 range -100 to 100, clamps it to that range, and linearly interpolates
-between three measured pulse widths, 1200us at full left, 1480us at
-center, and 1800us at full right, rather than assuming a symmetric
+between three measured pulse widths, 1200 µs at full left, 1480 µs at
+center, and 1800 µs at full right, rather than assuming a symmetric
 range around center. The result is clamped a second time, to a wider
-500us to 2500us hardware safety range, immediately before it is
+500 µs to 2500 µs hardware safety range, immediately before it is
 written to the timer register that drives the steering servo.

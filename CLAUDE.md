@@ -356,3 +356,169 @@ the colleague's.
   is already parenthetical (for example listing "the sensor suite in
   `@ch:hardware`" among other items). Don't stack two "as ... describes"
   clauses in one sentence; if a sentence needs two references, split it.
+  **Refinement from supervisor feedback:** a cross-reference that is not
+  itself part of the statement should become its own short, neutral
+  sentence at the end of the paragraph rather than an appositive clause.
+  "@sec:i2c-stack describes this sequence." replaced "a sequence
+  @sec:i2c-stack walks through", and "The firmware implementation is
+  described in @sec:actuator-control." replaced "How the firmware drives
+  them is covered in @sec:actuator-control." Use plain verbs for these
+  pointers, namely "describes", "reports", "is described in". Avoid
+  "covered in", "detailed in", "walks through", "as ... notes".
+
+## Supervisor Feedback: Academic Register (FM review, commits 5591ffa and e294f5b)
+
+The supervisor (DI Florian Mayer) reviewed the introduction and chapter 2 and
+rewrote them line by line. The edits are almost entirely about **register**,
+not about content: the prose was already correct, but it read like a
+well-written blog post rather than a thesis. Apply these rules to every
+chapter, and apply them when drafting new prose so the same pass does not
+have to happen again.
+
+- **Neutral technical verbs, never conversational ones.** This is the single
+  most frequent edit. Replacements actually made: "sits on/next to" to "is
+  mounted on / is connected to / listens on", "talks over I2C" to
+  "communicates over I2C", "answers to one of eight addresses" to "the
+  address is selected by", "the kit ships bare" to "the kit is available
+  standalone", "bolts onto" to "are mounted on", "walks through" to
+  "describes", "a reset costs about a second" to "a reset requires
+  approximately one second", "tristates both sides" to "sets both sides to
+  high impedance", "a plain byte pipe" to "a transparent byte stream",
+  "surfaces the calibration status" to "transmits the calibration status",
+  "picks up a nearby wall" and "keeps calibration turned on" to "detects" and
+  "enables". Also drop stance verbs like "it turned out to be a good fit",
+  which became "it proved well suited to the requirements".
+- **Prefer "the X of the Y" over the Saxon genitive "the Y's X",** especially
+  for the recurring self-references. "The platform's IMU" became "The IMU of
+  the platform", "this platform's driver" became "the driver of this
+  platform", "the platform's only wireless link" became "the only wireless
+  interface of the platform". More generally, cut the possessive entirely
+  where a definite article works: "This thesis's firmware runs on a
+  Nucleo-H533RE" became "The firmware runs on a Nucleo-H533RE".
+- **Use "this thesis" sparingly and only for genuine contribution or scope
+  statements.** Elsewhere use "the firmware", "the platform", "the work
+  presented here", or a passive construction. "This thesis gives that
+  hardware baseline its first application firmware" became "The work
+  presented here provides the first application firmware for this baseline".
+  "This thesis is the first work to put this board into operation" was kept,
+  because that sentence really is a contribution claim.
+- **Delete reader-facing justification and colour commentary.** Sentences
+  that explain why a fact is interesting, or that anticipate the reader's
+  reaction, were cut wholesale. Removed examples: "Being a widely sold
+  competition kit also means worn or crashed parts are easy to source and
+  replace, which matters when a fleet of these cars is driven by students",
+  "letting more than one ADS7128 share a bus if a design ever needs it",
+  "properties that matter when a fleet of cars is driven by students and
+  expected to survive repeated crashes", "It is the board that ties the rest
+  of the platform together". State the fact and stop. A short consequence
+  clause survives only when it is technically load-bearing, for example
+  "which matters on a track where the car measures its distance to wooden
+  barriers".
+- **Cut filler and hedging adverbs.** "just", "simply", "actually", "exactly",
+  "already", "straight", "ends up", "on the order of", "more ... than this
+  platform ends up needing". "the three cannot simply share one bus" became
+  "the three sensors cannot share a single bus without further measures";
+  "which of its eight channels it actually uses" became "the channel
+  assignment used on this platform"; "The AI-MotionLab itself is just the
+  lab" became a plain apposition naming what it is.
+- **State things positively; don't define by negation.** "It is not a single,
+  fixed design. Chassis, PCB, and microcontroller have all changed between
+  iterations" was compressed into one positive sentence, "It is not a single
+  fixed design but an MSP430-based platform that has been redesigned several
+  times during student projects up to its STM32-based version". Where a
+  contrast is genuinely needed, put the contrast first and the fact second,
+  as in "Unlike conventional infrared proximity sensors, which derive
+  distance from the intensity of the reflected light, the VL53L1X measures
+  the time a 940 nm laser pulse requires to travel to the target and back."
+- **Do not restate scope or authorship boundaries outside the sections that
+  own them.** The introduction repeated "@sec:non-goals places this out of
+  scope" and "not as contributions of this work" in several sections; the
+  supervisor left the statement once, in @sec:non-goals, and deleted the
+  echoes. Say the boundary where it belongs and reference it once.
+- **Split, don't stack.** Long sentences with a trailing subordinate clause
+  were broken into two or three sentences. "a 1/18-scale RC chassis detailed
+  in @sec:chassis and chosen for its robustness and ready availability of
+  spare parts" became "a 1/18-scale RC chassis described in @sec:chassis. It
+  was chosen for its robustness and the availability of spare parts."
+  Similarly the dense problem-statement paragraph was rebuilt as three short
+  paragraphs, namely the gap, the consequence that follows from it, and what
+  the thesis does about both.
+- **Keep list items grammatically parallel.** In @sec:goals, "Implement
+  drivers and integration for" became "Implement and integrate drivers for",
+  and "a crash, a low battery, or the car getting stuck can be detected and
+  acted on" became "a crash, a low battery, or a stuck car can be detected
+  and handled". Every item in a bullet list should start with the same part
+  of speech and keep the same shape.
+- **Prefer restating the noun over "namely" lists** when the list is really a
+  description. "one complex system to work on, namely sensing the
+  environment, actuating steering and throttle and reacting in real time"
+  became "a car that senses the environment, actuates steering and throttle,
+  and reacts in real time". "namely" survives where it introduces a genuine
+  definition, as in "the basic idea, namely a four-wheel-drive, 1/18-scale
+  car that ...".
+- **Name people in full on first mention.** "A. Läßer" became "Andreas
+  Läßer"; "A colleague, Benedikt Polivka, developed the testsuite alongside
+  this thesis's firmware, in parallel, so the two projects grew together"
+  became "The testsuite was developed by Benedikt Polivka
+  @PolivkaTestsuite2026". Drop the relationship narrative and keep the
+  attribution.
+- **Terminology consistency.** "lecture" became "course", "devboard" became
+  "development board", "car" became "vehicle" in several formal contexts,
+  "over-the-air update infrastructure" became `#gls("ota")` at its first
+  occurrence. Pick one term per concept and keep it.
+
+### Units, numbers, and symbols
+
+The supervisor consistently normalised these; follow the convention in new
+prose.
+
+- **Always put a space between a number and its unit ("Einheit"), with no
+  exceptions.** Write "220 mm", "165 g", "2.9 m", "100 Hz", "940 nm",
+  "400 kHz", "512 KB", "250 MHz", "1200 µs", never "220mm" or "100Hz". This
+  is the SI convention and it applies to every unit everywhere in the
+  document, including inside figure captions, table cells, and listing
+  comments. Grep for `[0-9](mm|cm|m|g|kg|s|ms|µs|ns|nm|Hz|kHz|MHz|GHz|V|mV|A|mA|W|KB|MB|GB)\b`
+  before committing a chapter to catch new ones.
+  - The space belongs between value and unit only. Percent and degree signs
+    stay attached to the number ("40%", "27°", "$plus.minus$90°"), and so do
+    non-unit suffixes that are part of a product designation, such as the
+    "36T" and "42T" spur gears in `sec:chassis`.
+  - Compound modifiers before a noun keep their hyphen and no space, as in
+    "a 12-bit converter" or "a 1.6-mm plate", but the standalone form always
+    takes the space.
+  - If a value and unit end up split across a line break in the rendered
+    PDF, use Typst's non-breaking space (`250~MHz`) for that occurrence.
+    Use a plain space by default so the source stays readable.
+- **Use the correct unit symbol, not an ASCII stand-in.** Microseconds are
+  "µs", not "us", which reads as the English word in running prose. Likewise
+  "Ω" not "Ohm", and "°C" not "degC".
+- **Angles use the degree sign, never the word.** Write "90° corners",
+  "180° hairpins", "a tolerance of 10°", "from -180° to 180°", "1 °/s",
+  never "90 degrees", "90-degree corners", or "one degree per second". Sign
+  every value in a range, not just the last one. The word "degree" survives
+  only where it is not an angle, as in "nine degrees of freedom" and "loses
+  a degree of freedom" in `sec:imu`.
+- **Dimension pairs use the multiplication sign with spaces**, matching
+  "3 mm × 3 mm" in `sec:adc`. Write "16 × 16 SPAD array", "4 × 4 ROI",
+  "10 × 10 ROI", never "16x16" with a letter x. Hexadecimal literals
+  (`0x28`, `0x30`) are unrelated and keep their "0x" prefix.
+- **Use SI/byte abbreviations, not spelled-out words**: "512 Kbytes" to
+  "512 KB", "272 Kbytes" to "272 KB", "meters per second squared" to "m/s²".
+- **Use real typographic symbols**: `°` for degrees ("27 degrees" to "27°"),
+  `°/s` for angular rate ("2000 degrees per second" to "2000 °/s"), `×` for
+  multiplication, `$plus.minus$` for ±, and a real superscript in "m/s²".
+- **Use "per" for scale factors**: "16384 LSB to one unitless quaternion
+  component" became "16384 LSB per unit quaternion component".
+
+### Citations
+
+- **Back general technical concepts with a real academic reference, not only
+  with the datasheet.** The gimbal-lock explanation in @sec:imu gained
+  `@Diebel2006` (a Stanford technical report on attitude representations)
+  alongside the BNO055 datasheet, which is cited separately for the concrete
+  consequence in the part. Datasheets support device facts; a named
+  phenomenon or method needs a proper source.
+- Image sources belong in the caption via `#imgsrc`, as described above under
+  Conventions. The supervisor's pass converted every "Image source:" line
+  under a figure into that form.
+

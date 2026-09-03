@@ -19,17 +19,17 @@ project used before the GET/SET protocol was in place, the same baseline
 
 == Sensor Performance <sec:sensor-performance>
 
-The front ToF sensor, running at about 30Hz with its narrow 4x4 ROI, reached a
-maximum usable range of 2.9m on the track. Within that range its readings
+The front ToF sensor, running at about 30 Hz with its narrow 4 × 4 ROI, reached a
+maximum usable range of 2.9 m on the track. Within that range its readings
 were accurate and reliable throughout testing. The car sits low to the
-ground, and even the minimum 15 degree FoV that the 4x4 ROI gives it still
+ground, and even the minimum 15° FoV that the 4 × 4 ROI gives it still
 catches ground reflections at longer range. Neither a longer timing budget
 nor a wider ROI changed this, so the limit comes from the sensor's mounting
 height rather than from its timing or ROI settings.
 
 The side ToF sensors never have to range that far, and they performed well
-throughout testing. Their 10x10 ROI, the same short-mode setting @sec:tof
-describes and well short of the sensor's full 16x16 SPAD array, kept the
+throughout testing. Their 10 × 10 ROI, the same short-mode setting @sec:tof
+describes and well short of the sensor's full 16 × 16 SPAD array, kept the
 corner-slope detection from @sec:turn-rate-threshold stable, and no further
 issues came up with either sensor.
 
@@ -46,7 +46,7 @@ stable for the whole evaluation.
 == State Machine / Turn Detection Performance <sec:turn-performance>
 
 Corner detection was reliable across the evaluation runs, catching both the
-90 degree corners and the 180 degree hairpins the exit grid in
+90° corners and the 180° hairpins the exit grid in
 @sec:completion-criteria targets. The side ToF ROI changes described in
 @sec:sensor-performance shifted the sensors' readings enough that the slope
 threshold from @sec:turn-rate-threshold needed retuning alongside them, and
