@@ -108,79 +108,47 @@ fusion filter of its own.
 ) <fig:bno055>
 
 The BNO055 exposes both non-fusion modes, where individual sensors can
-be read raw, and fusion modes, where the on-chip algorithm combines
-them. This platform runs it in NDOF mode, the fusion mode that uses all
-nine degrees of freedom (accelerometer, gyroscope, and magnetometer
-together) to compute absolute orientation referenced to magnetic north.
-NDOF also keeps fast magnetometer calibration turned on, which brings
-the magnetometer to a usable calibration state more quickly than the
+be read directly, and fusion modes, in which the on-chip algorithm combines
+them. The platform operates the device in NDOF mode, the fusion mode that 
+uses all nine degrees of freedom, comprising accelerometer, gyroscope, and 
+magnetometer, to determine absolute orientation referenced to magnetic north. 
+NDOF also enables fast magnetometer calibration, which recalibrates
+the magnetometer continuously during operation, in contrast to the 
 alternative NDOF_FMC_OFF mode. In this mode the fusion algorithm
 separates the accelerometer's raw signal into a gravity vector and a
 linear acceleration term, and reports orientation as both quaternion
 and Euler-angle data.
 
-On the #gls("i2c") side the BNO055 answers to one of two fixed addresses,
-selected by the level of its COM3 pin, 0x29 when COM3 is high and 0x28
-when it is low. This platform's firmware talks to it at 0x28, so COM3
-is wired low on the #gls("pcb"). At startup the firmware checks the
-chip's fixed identification value before doing anything else. It only
-issues a hardware reset if that check fails. A reset costs on the
-order of a second, while an already-booted sensor answers immediately.
+On the #gls("i2c") bus, the BNO055 uses one of two fixed addresses, selected by the level of the COM3 pin. The address is 0x29 when the pin is high and 0x28 when it is low. On this platform, COM3 is tied low on the #gls("pcb"), and the firmware therefore addresses the device at 0x28. During startup, the firmware first reads the fixed chip identification value and issues a hardware reset only if this check fails. A reset requires approximately one second, whereas a device that is already running responds immediately.
 
-This platform's driver does not read the BNO055's Euler-angle heading
-register directly. Instead it reads the quaternion output, where the
-register map fixes 16384 #glspl("lsb") to one unitless quaternion
-component, and computes yaw from the resulting w, x, y, z values with
-an arctangent. Reading the quaternion this way avoids the
-discontinuities and gimbal-lock artifacts that Euler-angle output is
-prone to. Yaw rate is read straight from the gyroscope's Z-axis
-register, where 16 #glspl("lsb") correspond to one degree per second,
-and linear acceleration, with gravity already removed by the fusion
-algorithm, is read where 100 #glspl("lsb") correspond to one meter per
-second squared.
+The driver of this platform does not read the Euler angle heading register of the BNO055 directly. Euler angle representations lose a degree of freedom at their singularity and jump at the wrap-around of their range, an effect known as gimbal lock @Diebel2006. The datasheet's own Euler output reflects that limit, with roll restricted to $plus.minus$90 degrees @BNO0552021. The driver reads the quaternion output instead, which the register map scales with 16384 #gls("lsb") per unit quaternion component, and derives the yaw angle from the resulting w, x, y, and z values using a two-argument arctangent.
+Yaw rate is read directly from the gyroscope's Z-axis
+register, where 16 #glspl("lsb") correspond to one degree per second. The linear acceleration, from which the fusion algorithm has already removed the gravity component, is scaled with 100 #gls("lsb") per m/s².
 
-Because the fusion algorithm calibrates continuously in the
-background, the BNO055 also reports a live calibration status. One
-field covers the system as a whole, and one covers each of the three
-physical sensors. Each field packs two bits, with 3 meaning fully
-calibrated and 0 meaning uncalibrated. Until the magnetometer field in
-particular reaches a full calibration, the fused heading can drift.
-That is why this platform's firmware surfaces calibration status
-alongside heading, yaw rate, and acceleration, instead of trusting the
-fused output unconditionally.
+Since the fusion algorithm calibrates continuously in the
+background, the BNO055 additionally reports current calibration status. One
+field covers the system as a whole, and field is provided for each of the three
+physical sensors, with a value of 3 indicating full calibration and 0 indicating an uncalibrated sensor. The fused heading can drift as long as the magnetometer field in particular has not reached full calibration. For this reason, the firmware transmits the calibration status together with heading, yaw rate, and acceleration rather than using the fused output unconditionally.
 
 === ADC (ADS7128) <sec:adc>
 
-The platform's external ADC is a Texas Instruments ADS7128, an
-8-channel, 12-bit, multiplexed #gls("sar") ADC in a 3mm x 3mm, 16-pin
-WQFN package @ADS71282020. Each of its eight channels can be
-independently configured as an analog input, a digital input, or a
-GPIO output, and an internal oscillator drives the conversion process,
-so the device needs no clock from the host. As noted in @sec:mcu, the
+The external ADC of the platform is a Texas Instruments ADS7128, an 8-channel multiplexed 12-bit #gls("sar") ADC in a 3 mm × 3 mm 16-pin WQFN package @ADS71282020. Each of the eight channels can be configured independently as an analog input, a digital input, or a GPIO output. An internal oscillator drives the conversion process, so that no clock signal is required from the host. As noted in @sec:mcu, the
 STM32H533RE has only two internal ADCs of its
-own, while the ADS7128 sits on the same I2C bus as the
+own, while the ADS7128 listens on the same I2C bus as the
 rest of the sensor stack and adds eight more channels
-without using any of the microcontroller's own ADC pins, more
-headroom than this platform ends up needing.
+without using any of the microcontroller's built-in ADC pins, where the available number of channels exceeds the requirements of this platform.
 
 #figure(
   image("/assets/pictures/ads7128.png", width: 50%),
   caption: [ADS7128, WQFN-16 package #imgsrc(<TIADS7128ProductPage2026>)],
 ) <fig:ads7128>
 
-The ADS7128 answers to one of eight I2C addresses, selected by a pair
-of external resistors on its ADDR pin rather than a single
-logic-level pin, letting more than one ADS7128 share a bus if a
-design ever needs it. How this platform's firmware drives the device
-and which of its eight channels it actually uses is covered in
-@sec:adc-handling.
+The address of the ADS7128 is selected by a pair of external resistors on the ADDR pin, which allows one of eight addresses to be configured. The firmware implementation and the channel assignment used on this platform are described in @sec:adc-handling.
 
 === Wheel-speed Sensor (TLE4966L) <sec:hall>
 
 Wheel speed is measured with an Infineon TLE4966L, a dual Hall-effect
-IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. It sits next to a
-ring of alternating magnetic poles on the wheel and outputs one speed
-pulse per pole pair as the wheel turns.
+IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. The device is mounted adjacent to a ring of alternating magnetic poles on the wheel and generates one speed pulse per pole pair.
 
 #figure(
   grid(
@@ -193,11 +161,8 @@ pulse per pole pair as the wheel turns.
   caption: [TLE4966L, PG-SSO-4-1 package, and this platform's RPM sensor board carrying it #imgsrc(<InfineonTLE4966LProductPage2026>, <KrennRPMSensor2026>)],
 ) <fig:tle4966l>
 
-What sets the TLE4966L apart from a plain Hall switch is a second
-output pin that reports rotation direction alongside the speed pulse.
-A plain switch can only say how fast a wheel is turning, not which
-way. This platform uses the TLE4966L for that second signal, because
-telling forward from reverse matters for the speed controller.
+The TLE4966L differs from a simple Hall switch in providing a second output that indicates the direction of rotation in addition to the speed pulse.
+A simple switch provides only the rotational speed, not its direction. This platform uses the second signal because the speed controller requires the distinction between forward and reverse motion.
 
 == Motor Drivers (BTN9970LV) <sec:motor-drivers>
 
@@ -213,37 +178,22 @@ in one automotive-qualified package.
 
 Each driver takes two digital inputs. IN selects which side of the
 half-bridge conducts, fast enough to be driven straight from a #gls("pwm")
-signal, and INH enables the device or tristates both sides. The datasheet
-notes that two of them form an H-bridge, and this platform wires exactly
-that, one IC on each motor terminal, so a direction and a speed can be set
-from the pair. How the firmware drives them is covered in @sec:actuator-control.
+signal, and INH enables the device or sets both sides to high impedance. Two of these drivers form a full H-bridge, which is the configuration used on this platform, with one IC connected to each motor terminal. Direction and speed are therefore set through the combination of both drivers. The firmware implementation is described in @sec:actuator-control.
 
 Each driver also reports its high-side load current on an IS pin, which this
-platform reads per motor terminal on one #gls("adc") channel each, as
-@sec:adc-handling describes. Overcurrent, overtemperature, and undervoltage
-protection are built into the driver and latch it off until the fault clears,
-with no firmware support needed.
+platform reads one such signal per motor terminal, each on a separate #gls("adc") channel, as
+@sec:adc-handling describes. Protection against overcurrent, overtemperature, and undervoltage is implemented in the driver itself and requires no support from the firmware.
 
 == WiFi Bridge (ESP8266) <sec:esp-bridge>
 
-The platform's only wireless link is an AZ-Delivery D1 mini, a small
-board built around an ESP8266MOD-12F WiFi module, with 4MB of flash
-and a micro-USB connector used for both power and programming
-@AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor
-and pinout as the original WeMos design, but this platform uses
-AZ-Delivery's own board, not a genuine WeMos part. On this platform it
-does one job. It sits on the USART described in @sec:mcu, between the
-STM32 and the AI-MotionLab testsuite, moving telemetry and #gls("ota")
-update traffic over WiFi that would otherwise need a wired connection
-to the car.
+The only wireless interface of the platform is an AZ-Delivery D1 mini, a compact board based on an ESP8266MOD-12F WiFi module with 4 MB of flash and a micro-USB connector used for both power supply and programming @AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor
+pinout as in the original WeMos design, but this platform uses
+AZ-Delivery's own board, not a genuine WeMos part. The module serves a single function on this platform. It is connected to the USART described in @sec:mcu, between the
+STM32 and the AI-MotionLab testsuite. It transfers telemetry data and over-the-air update traffic over WiFi, which would otherwise require a wired connection to the vehicle.
 
 #figure(
   image("/assets/pictures/D1_Mini_TopDown.jpg", width: 30%),
   caption: [AZ-Delivery D1 mini, top-down view #imgsrc(<AZDeliveryD1Mini2026>)],
 ) <fig:d1-mini>
 
-This platform's firmware treats that link as a plain byte pipe. It
-writes bytes to the USART and reads bytes back over #gls("dma"), with
-no awareness of what the ESP8266 does with them beyond that. The
-ESP8266's own firmware, which handles the WiFi connection and frame
-routing, is not part of this thesis.
+The firmware of this platform uses this link as a transparent byte stream. It writes bytes to the USART and receives bytes over #gls("dma") without interpreting how the ESP8266 processes them. The firmware of the ESP8266 itself, which manages the WiFi connection and the routing of frames, is not part of this thesis.
