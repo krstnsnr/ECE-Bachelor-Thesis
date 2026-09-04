@@ -50,7 +50,7 @@ development board carrying an STM32H533RET6 microcontroller
 ) <fig:nucleo-board>
 
 The STM32H533RE is based on an Arm Cortex-M33 core with a hardware floating-point unit, clocked at up to 250 MHz @STM32H533xx2026. It provides 512 KB of flash and 272 KB of #gls("sram"). This exceeds the requirements of the sensor drivers, control loop, state machine, and telemetry stack implemented here, leaving headroom for future extensions.
-The #gls("i2c") buses connect the ADS7128 ADC, the BNO055 IMU, and the VL53L1X distance sensors. A #gls("usart") carries the traffic of the ESP8266 WiFi bridge, and the #gls("pwm") timers drive the motor and steering actuators. The corresponding firmware implementation is described in @sec:i2c-stack and @sec:actuator-control.
+The #gls("i2c") buses connect the ADS7128 ADC, the BNO055 #gls("imu"), and the VL53L1X distance sensors. A #gls("usart") carries the traffic of the ESP8266 WiFi bridge, and the #gls("pwm") timers drive the motor and steering actuators. The corresponding firmware implementation is described in @sec:i2c-stack and @sec:actuator-control.
 
 The Nucleo-64 board provides the infrastructure required for development, including an on-board STLINK-V3EC debugger and programmer, headers exposing the I/O of the STM32 for test wiring, and support for the STM32CubeMX and STM32CubeIDE toolchain used to generate the peripheral initialization code @STM32CubeMX2026.
 
@@ -95,7 +95,7 @@ while the left and right sensors operate in short mode with a wider 10 × 10
 
 === IMU (BNO055) <sec:imu>
 
-The #gls("imu") of the platform is a Bosch Sensortec BNO055. The device combines a triaxial 14-bit accelerometer, a triaxial 16-bit gyroscope rated up to 2000 °/s, a triaxial magnetometer, and a 32-bit Cortex-M0+ microcontroller running the sensor fusion firmware provided by Bosch @BNO0552021.
+The IMU of the platform is a Bosch Sensortec BNO055. The device combines a triaxial 14-bit accelerometer, a triaxial 16-bit gyroscope rated up to 2000 °/s, a triaxial magnetometer, and a 32-bit Cortex-M0+ microcontroller running the sensor fusion firmware provided by Bosch @BNO0552021.
 Rather than transmitting raw accelerometer, gyroscope,
 and magnetometer samples to the host, the BNO055 fuses them on-chip and
 reports ready-to-use orientation data over #gls("i2c"). That leaves the

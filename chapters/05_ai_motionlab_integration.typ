@@ -1,3 +1,5 @@
+#import "/helpers/gls.typ": gls, glspl
+
 = Integration with the AI-MotionLab Testsuite <ch:integration>
 // Scope note: the GUI/testsuite itself is not this thesis's contribution.
 // This chapter should be framed from the firmware side -- what the STM32
@@ -29,8 +31,8 @@ protocol from the car side.
 == Car Communication Module <sec:car-comm-module>
 
 The testsuite reaches a car over WiFi. It opens a TCP connection to the
-ESP8266 bridge of the car, which forwards the traffic to the STM32 over a UART
-link. Each car carries its own bridge and is addressed by its own name on the
+ESP8266 bridge of the car, which forwards the traffic to the STM32 over a
+#gls("uart") link. Each car carries its own bridge and is addressed by its own name on the
 network, so that the testsuite can select one of several cars.
 @fig:comm-chain shows the resulting path and the frame that travels along it.
 

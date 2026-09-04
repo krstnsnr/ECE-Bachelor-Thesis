@@ -26,8 +26,9 @@ repeatable performance data across many runs.
 This thesis is about supporting this kind of ongoing, research-grade testing and tuning.
 The chassis and main #gls("pcb") have already been migrated to a newer
 hardware baseline built around an STM32H533RE microcontroller, introduced in
-@sec:crazycar-history and detailed in @ch:hardware. The work presented here provides the first application firmware for this baseline, covers the initial board bring-up, and
-debugs the problems that surfaced along the way. It also connects the
+@sec:crazycar-history and described in @ch:hardware. The work presented here
+provides the first application firmware for this baseline, covers the initial
+board bring-up, and debugs the problems that surfaced along the way. It also connects the
 platform to FH JOANNEUM's AI-MotionLab, and introduces a shared test
 infrastructure described in @sec:ai-motionlab-role that can observe a car on
 track without instrumenting the track itself.
@@ -75,7 +76,7 @@ The new CrazyCar hardware baseline had no application firmware. It consists of a
 
 A second problem follows from the first. Firmware whose behavior cannot be observed at runtime must be tuned over a wired debugger: the car is stopped, connected, reflashed, and tested again. Control-loop gains and turn detection require many such cycles, which makes tuning slow and results difficult to reproduce between runs.
 
-This thesis addresses both. It develops the firmware required for autonomous driving on the new baseline, and extends the existing OTA link with telemetry output and adjustable parameters, so that behavior can be observed and changed while the car is running. This makes the AI-MotionLab usable for reproducible tuning and evaluation.
+This thesis addresses both. It develops the firmware required for autonomous driving on the new baseline, and extends the existing #gls("ota") link with telemetry output and adjustable parameters, so that behavior can be observed and changed while the car is running. This makes the AI-MotionLab usable for reproducible tuning and evaluation.
 
 
 == Goals <sec:goals>
@@ -94,7 +95,7 @@ The goals of this thesis are:
   (STM32H533RE) that drives the car autonomously around a track.
 - Add the telemetry and parameter interfaces required by the automated
   test and tuning platform, so that the testsuite can observe
-  and tune the car over the existing communication and #gls("ota")
+  and tune the car over the existing communication and OTA
   update infrastructure.
 - Evaluate the resulting platform and report the findings, including the #gls("pcb")
   design oversights identified during evaluation.
