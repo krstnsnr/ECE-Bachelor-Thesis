@@ -5,9 +5,9 @@
 
 == Chassis: XRAY M18 Pro LiPo 4WD <sec:chassis>
 
-The hardware of this thesis builds on the XRAY M18 Pro
-LiPo, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from XRAY
-@MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase of 150 mm and
+The hardware of this thesis builds on the XRAY M18 Pro LiPo shown in
+@fig:chassis, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from
+XRAY @MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase of 150 mm and
 a weight of approximately 165 g. The main chassis plate is #gls("cnc")-machined
 from 1.6 mm carbon fiber, thin enough to flex a little on a low-grip
 surface but stiff enough to hold its line at higher speeds. XRAY's Multi-Flex
@@ -30,7 +30,7 @@ fully custom electronics platform, exactly what this project set out to do.
 == Main PCB (XRay Legacy V1) <sec:main-pcb>
 
 The components described in this chapter are mounted on a custom PCB, designed in-house by Andreas Läßer for this STM32-based generation of CrazyCar @LaesserXRayLegacy2023.
-The board carries the #gls("i2c") sensor stack, the motor and steering drivers, the ADC, and the ESP8266 WiFi bridge, together with the Nucleo board holding the STM32H533RE, which acts as the central platform.
+The board carries the #gls("i2c") sensor stack, the motor and steering drivers, the ADC, and the ESP8266 WiFi bridge, together with the Nucleo board holding the STM32H533RE, which acts as the central platform. @fig:main-pcb shows the board from above.
 This thesis is the first work to put this very version of the board into operation and to evaluate it under load. The design oversights identified in the process are reported in @sec:pcb-impact-summary.
 
 #figure(
@@ -42,7 +42,7 @@ This thesis is the first work to put this very version of the board into operati
 
 The firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
 development board carrying an STM32H533RET6 microcontroller
-@UM3121_2025. The choice of the microcontroller was determined by the "Embedded Systems" course and its orientation towards the future lab classes. It also proved well suited to the requirements of the firmware.
+@UM3121_2025. The choice of the microcontroller was determined by the "Embedded Systems" course and its orientation towards the future lab classes. It also proved well suited to the requirements of the firmware. @fig:nucleo-board shows the top and bottom layout of the board.
 
 #figure(
   image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 70%),
@@ -95,7 +95,7 @@ while the left and right sensors operate in short mode with a wider 10 × 10
 
 === IMU (BNO055) <sec:imu>
 
-The IMU of the platform is a Bosch Sensortec BNO055. The device combines a triaxial 14-bit accelerometer, a triaxial 16-bit gyroscope rated up to 2000 °/s, a triaxial magnetometer, and a 32-bit Cortex-M0+ microcontroller running the sensor fusion firmware provided by Bosch @BNO0552021.
+The IMU of the platform is a Bosch Sensortec BNO055, shown in @fig:bno055. The device combines a triaxial 14-bit accelerometer, a triaxial 16-bit gyroscope rated up to 2000 °/s, a triaxial magnetometer, and a 32-bit Cortex-M0+ microcontroller running the sensor fusion firmware provided by Bosch @BNO0552021.
 Rather than transmitting raw accelerometer, gyroscope,
 and magnetometer samples to the host, the BNO055 fuses them on-chip and
 reports ready-to-use orientation data over #gls("i2c"). That leaves the
@@ -132,7 +132,7 @@ physical sensors, with a value of 3 indicating full calibration and 0 indicating
 
 === ADC (ADS7128) <sec:adc>
 
-The external ADC of the platform is a Texas Instruments ADS7128, an 8-channel multiplexed 12-bit #gls("sar") ADC in a 3 mm × 3 mm 16-pin WQFN package @ADS71282020. Each of the eight channels can be configured independently as an analog input, a digital input, or a GPIO output. An internal oscillator drives the conversion process, so that no clock signal is required from the host. As noted in @sec:mcu, the
+The external ADC of the platform is a Texas Instruments ADS7128, shown in @fig:ads7128. It is an 8-channel multiplexed 12-bit #gls("sar") ADC in a 3 mm × 3 mm 16-pin WQFN package @ADS71282020. Each of the eight channels can be configured independently as an analog input, a digital input, or a GPIO output. An internal oscillator drives the conversion process, so that no clock signal is required from the host. As noted in @sec:mcu, the
 STM32H533RE has only two internal ADCs of its
 own, while the ADS7128 listens on the same I2C bus as the
 rest of the sensor stack and adds eight more channels
@@ -148,7 +148,7 @@ The address of the ADS7128 is selected by a pair of external resistors on the AD
 === Wheel-speed Sensor (TLE4966L) <sec:hall>
 
 Wheel speed is measured with an Infineon TLE4966L, a dual Hall-effect
-IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. The device is mounted adjacent to a ring of alternating magnetic poles on the wheel and generates one speed pulse per pole pair.
+IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. The device is mounted adjacent to a ring of alternating magnetic poles on the wheel and generates one speed pulse per pole pair. @fig:tle4966l shows the package and the sensor board that carries it.
 
 #figure(
   grid(
@@ -158,7 +158,7 @@ IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. The device is mounted adjace
     image("/assets/pictures/TLE4966L.png", width: 55%),
     image("/assets/pictures/RPM_Sensor_V2.0_Board.png", width: 65%),
   ),
-  caption: [TLE4966L, PG-SSO-4-1 package, and this platform's RPM sensor board carrying it #imgsrc(<InfineonTLE4966LProductPage2026>, <KrennRPMSensor2026>)],
+  caption: [TLE4966L, PG-SSO-4-1 package, and the RPM sensor board carrying it #imgsrc(<InfineonTLE4966LProductPage2026>, <KrennRPMSensor2026>)],
 ) <fig:tle4966l>
 
 The TLE4966L differs from a simple Hall switch in providing a second output that indicates the direction of rotation in addition to the speed pulse.
@@ -169,7 +169,7 @@ A simple switch provides only the rotational speed, not its direction. This plat
 The drive motor is switched by two Infineon BTN9970LV half-bridge
 drivers from the NovalithIC+ family @BTN9970LV2021. Each
 integrates a high-side and a low-side MOSFET with a driver IC
-in one automotive-qualified package.
+in one automotive-qualified package, shown in @fig:btn9970lv.
 
 #figure(
   image("/assets/pictures/btn9970lv.jpg", width: 45%),
@@ -186,7 +186,7 @@ platform reads one such signal per motor terminal, each on a separate #gls("adc"
 
 == WiFi Bridge (ESP8266) <sec:esp-bridge>
 
-The only wireless interface of the platform is an AZ-Delivery D1 mini, a compact board based on an ESP8266MOD-12F WiFi module with 4 MB of flash and a micro-USB connector used for both power supply and programming @AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor and
+The only wireless interface of the platform is an AZ-Delivery D1 mini, shown in @fig:d1-mini. It is a compact board based on an ESP8266MOD-12F WiFi module with 4 MB of flash and a micro-USB connector used for both power supply and programming @AZDeliveryD1MiniManual2019. It follows the same D1 mini form factor and
 pinout as the original WeMos design, but this platform uses
 AZ-Delivery's own board, not a genuine WeMos part. The module serves a single function on this platform. It is connected to the USART described in @sec:mcu, between the
 STM32 and the AI-MotionLab testsuite. It transfers telemetry data and over-the-air update traffic over WiFi, which would otherwise require a wired connection to the vehicle.
