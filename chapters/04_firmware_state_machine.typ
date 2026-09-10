@@ -32,7 +32,7 @@ once the turn is complete. A sufficiently long open stretch raises
 `CAR_STRAIGHT` back to `CAR_FULL_THROTTLE`.
 
 #figure(
-  image("/assets/graphics/selfdrawn/state_machine.svg", width: 100%),
+  image("/assets/graphics/selfdrawn/state_machine.svg", width: 70%),
   caption: [Core autonomous driving states and their transitions],
 ) <fig:state-machine>
 

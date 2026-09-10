@@ -11,7 +11,7 @@
       key: "esp", short: "ESP", long: "ESP32/ESP8266", description: [IoT microcontroller family.],
     ),
     (
-      key: "ota", short: "OTA", long: "Over the Air Updates", description: [Wireless firmware update.],
+      key: "ota", short: "OTA", long: "Over the Air", description: [Wireless firmware update.],
     ),
     (
       key: "pcb", short: "PCB", long: "Printed Circuit Board", description: [Board wiring components via etched tracks.],
