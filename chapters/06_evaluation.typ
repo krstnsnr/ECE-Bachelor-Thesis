@@ -59,14 +59,25 @@ given a lower priority, because the tuning workflow already repositions a car
 through `CAR_POINT_FOLLOW` when a lap fails, rather than relying on recovery
 to complete the lap.
 
+== Operator Mode Performance <sec:operator-mode-performance>
+
 The two operator-driven modes from @sec:operator-modes both performed well.
 `CAR_REMOTE_CONTROL` operated without issue, since it passes the steering and
-speed setpoints of the operator through unchanged. `CAR_POINT_FOLLOW` also
-tracked its path well, with a small drift on the straight following a corner.
-The wheel-speed sensor from @sec:hall is mounted on a single rear wheel, so
-the dead-reckoned pose behind the pure-pursuit follower cannot account for the
-inner and outer rear wheels turning at different rates through a corner.
-Calibration removed most of this drift, but a small amount remained.
+speed setpoints of the operator through unchanged.
+
+`CAR_POINT_FOLLOW` tracked its path well. @fig:point-follow shows a run in
+which the car reached a commanded goal pose over a path with two direction
+changes. The driven trajectory stays close to the planned path, with a small
+drift on the straight following a corner. The wheel-speed sensor from @sec:hall
+is mounted on a single rear wheel, so the dead-reckoned pose behind the
+pure-pursuit follower cannot account for the inner and outer rear wheels
+turning at different rates through a corner. Calibration removed most of this
+drift, but a small amount remained.
+
+#figure(
+  image("/assets/pictures/drive_to_pose.png", width: 100%),
+  caption: [Planned and driven path of a point-follow run in the AI-MotionLab],
+) <fig:point-follow>
 
 == Usability of the Tuning Platform <sec:usability>
 
