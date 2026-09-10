@@ -41,7 +41,7 @@ This thesis is the first work to put this very version of the board into operati
 
 The firmware runs on a Nucleo-H533RE board, ST's Nucleo-64
 development board carrying an STM32H533RET6 microcontroller
-@UM3121_2025. The choice of the microcontroller was determined by the "Embedded Systems" course and its orientation towards the future lab classes. It also proved well suited to the requirements of the firmware. @fig:nucleo-board shows the top and bottom layout of the board.
+@UM3121_2025. The choice of the microcontroller was determined by the "Embedded Systems" course and its orientation toward the future lab classes. It also proved well suited to the requirements of the firmware. @fig:nucleo-board shows the top and bottom layout of the board.
 
 #figure(
   image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 70%),

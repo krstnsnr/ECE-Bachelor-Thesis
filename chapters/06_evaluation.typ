@@ -180,7 +180,7 @@ foreseen, so it provides no footprint for the WiFi bridge from
 thesis and Benedikt Polivka's thesis @PolivkaTestsuite2026 required one. This
 thesis needed it for OTA updates and telemetry, and the testsuite needed it
 for its live link to the car. The D1 mini board was therefore added
-afterwards. It is wired directly into the Arduino-style headers of the Nucleo
+afterward. It is wired directly into the Arduino-style headers of the Nucleo
 board rather than fitted to a dedicated footprint on the main PCB.
 
 === STM32 Pin Layout <sec:pcb-pin-layout>

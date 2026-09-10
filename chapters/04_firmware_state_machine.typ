@@ -98,7 +98,7 @@ Steering uses pure pursuit. The follower selects the path point at a fixed
 lookahead distance along the current segment and computes the steering angle
 that guides the car onto that point. A reverse segment is handled with an
 inverted heading and steering sign, so the same geometry drives the car
-backwards. The speed is a fixed forward or reverse value that is reduced as the
+backward. The speed is a fixed forward or reverse value that is reduced as the
 car approaches the end of a segment. At the end of a segment the follower
 pauses briefly before it continues with the next one, which allows the car to
 settle before it reverses direction. The follower aborts the mode if the path

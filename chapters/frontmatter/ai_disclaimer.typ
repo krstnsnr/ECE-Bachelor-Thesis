@@ -21,7 +21,7 @@ Anthropic was used for the following purposes:
 
 - Locating register descriptions and timing requirements in the microcontroller
   reference manual and in the sensor datasheets.
-- Refactoring and optimising firmware code.
+- Refactoring and optimizing firmware code.
 - Writing the scripts that evaluate the recorded session and lap logs and
   compute the lap statistics reported in the evaluation chapter.
 - Generating the lap path figure of the evaluation chapter from the logged

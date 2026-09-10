@@ -307,6 +307,17 @@ the colleague's.
 
 ## Writing Style
 
+- **Use American English spelling throughout**, never British. Write
+  "optimize" not "optimise", "behavior" not "behaviour", "center" not
+  "centre", "meter" not "metre", "modeled" not "modelled", "analyze" not
+  "analyse", "gray" not "grey", "toward" not "towards", "while" not "whilst",
+  "among" not "amongst". The `-ize`/`-ization` ending applies to every verb
+  that takes it, including "initialize", "normalize", "summarize",
+  "recognize", and "prioritize". Two exceptions are out of scope, namely
+  quoted titles in `helpers/bib/ECEtempBib.bib`, which keep the spelling of
+  the original source, and identifiers taken from code or datasheets. Grep
+  for `(ise|ising|isation|our|re|ce)\b` candidates before committing a
+  chapter, or scan for the words listed above.
 - Never use an em dash (—) in thesis prose or in this file. Rewrite with a
   comma, a period and a new sentence, or parentheses instead.
 - Use a hyphen (-) only when grammar requires it (compound modifiers like

@@ -6,7 +6,7 @@
 
 Embedded systems are easier to learn by building something concrete and
 fun, not just isolated exercises on a development board. Within the Electronics and
-Computer Engineering (ECE) programme at FH JOANNEUM, CrazyCar is that
+Computer Engineering (ECE) program at FH JOANNEUM, CrazyCar is that
 concrete project. It is a small, autonomous 1/18-scale racing car that
 gives students one complex system to work on, a car that senses the environment, actuates steering and throttle, and reacts in real time.
 
