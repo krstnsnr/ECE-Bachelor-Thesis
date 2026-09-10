@@ -138,7 +138,17 @@ turning at different rates through a corner. Calibration removed most of this
 drift, but a small amount remained.
 
 #figure(
-  image("/assets/pictures/drive_to_pose.png", width: 100%),
+  // The plot was exported with a filename-style title above the axes. The
+  // box clips that strip off the top; 700/1100 is the aspect of the export.
+  {
+    let w = 16cm
+    let full = w * 700 / 1100
+    let cut = full * 0.085
+    box(clip: true, width: w, height: full - cut)[
+      #place(top + left, dy: -cut,
+        image("/assets/pictures/drive_to_pose.png", width: w))
+    ]
+  },
   caption: [Planned and driven path of a point-follow run in the AI-MotionLab],
 ) <fig:point-follow>
 
