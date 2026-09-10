@@ -12,11 +12,12 @@ review, alongside the position of the car as measured by the OptiTrack system
 of the laboratory. That position is independent of the dead reckoning that the
 firmware computes on board.
 
-The recorded material comes from runs between July and August 2026 and holds
-137 laps in total. One log covers a continuous week of testing and contributes
-70 of them, which is the largest set driven on one track layout and therefore
-the set used for the path and timing results in @sec:turn-performance. Within
-those 70 laps, 59 share one speed setting and support the timing comparison.
+The recorded material comes from the complete-laps logs described in
+@sec:session-logging and holds 137 laps recorded between July and August 2026.
+One of these logs, kept over one week of testing, contributes 70 laps. That is
+the largest set driven, so it provides the path and timing
+results in @sec:turn-performance. Within those 70 laps, 59 share one speed
+setting and support the timing comparison.
 The remaining laps come from shorter runs at other configurations and enter
 only the lap completion count.
 
