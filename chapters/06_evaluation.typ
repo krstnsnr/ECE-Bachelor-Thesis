@@ -7,8 +7,10 @@
 The firmware was evaluated in on-track runs in the AI-MotionLab. Each run
 drove the autonomous loop over the manually defined circuit described in
 @sec:ai-motionlab-role. Telemetry streamed back through the GET/SET protocol
-during every run, and the session logs of the testsuite captured it alongside
-the tracked position of the car for later review.
+during every run. The session logs of the testsuite captured it for later
+review, alongside the position of the car as measured by the OptiTrack system
+of the laboratory. That position is independent of the dead reckoning that the
+firmware computes on board.
 
 The evaluation is largely qualitative. Sensor readings were judged by inspecting the
 logged telemetry for stable and plausible values. @sec:sensor-performance
@@ -46,7 +48,7 @@ firmware does not read the Z axis, so the offset had no effect on driving.
 The ADC readings for battery voltage and motor current were accurate and
 stable throughout the evaluation.
 
-== State Machine / Turn Detection Performance <sec:turn-performance>
+== State Machine and Turn Detection Performance <sec:turn-performance>
 
 Corner detection was reliable across the evaluation runs. Both the 90° corners
 and the 180° hairpins targeted by the exit grid in @sec:completion-criteria
@@ -63,12 +65,12 @@ behavior that follows it repeated consistently.
 
 #figure(
   image("/assets/graphics/selfdrawn/lap_path_overlay.svg", width: 100%),
-  caption: [Tracked path of 70 laps overlaid on the circuit outline],
+  caption: [Path of 70 laps measured by the OptiTrack system, overlaid on the circuit outline],
 ) <fig:lap-overlay>
 
 Lap timing from the same runs quantifies that consistency. Of the 70 laps, 59
 were driven at one speed setting, and @tbl:lap-consistency summarizes them.
-Lap time stayed within 0.10 s of a mean of 10.55 s, which is about one percent,
+Lap time stayed within 0.10 s of a mean of 10.55~s, which is about one percent,
 and the driven distance stayed within 0.28 m of a mean of 15.26 m. The
 remaining 11 laps covered the same distance at a lower average speed.
 

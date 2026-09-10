@@ -56,8 +56,9 @@ sensor readings, turn detection, and recovery behavior by inspecting logged
 telemetry and observing repeated runs, rather than through a statistically
 designed measurement campaign. The findings in @ch:evaluation therefore
 describe what was observed across those runs, not a quantified error rate or
-a confidence interval. They establish that the platform works reliably in
-practice without quantifying that reliability.
+a confidence interval. Lap timing is the exception, and it measures the
+repeatability of a completed lap rather than the detection rate of an
+individual corner.
 
 Two behaviors observed during the evaluation remain current limitations
 rather than solved problems. @sec:turn-performance and
