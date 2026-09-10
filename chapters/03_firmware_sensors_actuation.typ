@@ -106,19 +106,23 @@ noise @ADS71282020. After a channel change the driver reads the channel twice an
 discards the first conversion, so that only a settled sample is used.
 
 This platform uses three of the eight channels. One channel reads the
-battery voltage through a 10 kΩ/18 kΩ divider. The other two read the
-negative and positive-side current-sense outputs of the BTN9970LV
-half-bridge motor drivers described in @sec:motor-drivers. The current
-on the IS pin of each driver is converted to a voltage across a
-2 kΩ sense resistor before it reaches the ADC channel.
+battery voltage through a 10 kΩ/18 kΩ divider. The other two read the negative and
+positive-side current-sense outputs of the BTN9970LV half-bridge motor
+drivers described in @sec:motor-drivers. Each driver mirrors its load
+current to the IS pin, reduced by the differential current sense ratio of
+the device. The datasheet gives that ratio as typically 40 × 10³
+@BTN9970LV2021. A 2 kΩ sense resistor turns the resulting sense current
+into a voltage for the ADC channel. The firmware reverses this chain. It
+divides the measured voltage by the sense resistor, subtracts the typical
+offset current of 160 µA, and multiplies by 40 × 10³ to obtain the load
+current @BTN9970LV2021.
 
 The rest of the firmware works with physical units only. Above the
 channel-select and read functions, the driver exposes two getters,
 `ADS7128_GetBatteryVoltage()` and `ADS7128_GetCurrent()`. Each of them
 reads its channel, waits for a settled sample, and converts the result
 into a physical unit, volts for the battery and amperes for the motor
-current. The conversion uses the divider and current-sense relations
-described in @sec:motor-drivers. `control_loop.c` calls the getter for
+current, using the relations given above. `control_loop.c` calls the getter for
 the channel it requires, at the rates shown in @fig:system-diagram,
 and writes the returned value into the matching telemetry global.
 
