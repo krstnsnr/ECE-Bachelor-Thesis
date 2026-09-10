@@ -59,8 +59,9 @@ describe what was observed across those runs, not a quantified error rate or
 a confidence interval. They establish that the platform works reliably in
 practice without quantifying that reliability.
 
-Two behaviors identified in @sec:turn-performance remain current limitations
-rather than solved problems. `CAR_RECOVER` sometimes needs two or three
+Two behaviors observed during the evaluation remain current limitations
+rather than solved problems. @sec:turn-performance and
+@sec:operator-mode-performance report them. `CAR_RECOVER` sometimes needs two or three
 attempts to free a stuck car. The repositioning through `CAR_POINT_FOLLOW`
 covered this case during the evaluation, but the state itself would benefit
 from further tuning. The dead-reckoned pose of `CAR_POINT_FOLLOW` also drifts
