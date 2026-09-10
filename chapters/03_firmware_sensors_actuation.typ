@@ -88,8 +88,8 @@ address.
 
 All register access uses a two-byte command, an operation code
 followed by a register address. The driver of this platform uses two
-of the opcodes defined in the datasheet, one for a single register
-write and one for a single register read. A completed 12-bit
+of the opcodes defined in the datasheet @ADS71282020, one for a single
+register write and one for a single register read. A completed 12-bit
 conversion result is read back #gls("msb")-justified across two bytes,
 the upper eight bits followed by the lower four bits padded with
 zeros. The driver reassembles them into a single 12-bit value by
@@ -102,7 +102,7 @@ toggling the multiplexer directly. The driver therefore writes the
 required channel to the channel-select register of the device before
 every conversion. It also enables 32× oversampling, the built-in
 averaging filter of the ADS7128, which adds settling time and reduces
-noise. After a channel change the driver reads the channel twice and
+noise @ADS71282020. After a channel change the driver reads the channel twice and
 discards the first conversion, so that only a settled sample is used.
 
 This platform uses three of the eight channels. One channel reads the
@@ -110,7 +110,8 @@ battery voltage through a 10 kΩ/18 kΩ divider. The other two read the
 negative and positive-side current-sense outputs of the BTN9970LV
 half-bridge motor drivers described in @sec:motor-drivers. The current
 on the IS pin of each driver is converted to a voltage across a
-2 kΩ sense resistor before it reaches the ADC channel.
+2 kΩ sense resistor before it reaches the ADC channel. Both the divider
+and the sense resistor are set by the main PCB @LaesserXRayLegacy2023.
 
 The rest of the firmware works with physical units only. Above the
 channel-select and read functions, the driver exposes two getters,

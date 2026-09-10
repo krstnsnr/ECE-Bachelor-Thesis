@@ -79,7 +79,7 @@ matters on a track where the car measures its distance to wooden barriers.
   caption: [VL53L1X distance sensor, Pimoroni breakout board, front and back #imgsrc(<PimoroniVL53L1XBreakout2026>)],
 ) <fig:tof-sensor>
 
-Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address, so the three sensors cannot share a single bus without further measures. Each sensor provides an active-low XSHUT pin that holds it in standby. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
+Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address, so the three sensors cannot share a single bus without further measures. Each sensor provides an active-low XSHUT pin that holds it in standby @VL53L1X2024. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
 
 Ranging is tuned through three settings. The distance mode trades range against
 immunity to ambient light. Long mode reaches the maximum ranging distance of
@@ -120,7 +120,7 @@ separates the accelerometer's raw signal into a gravity vector and a
 linear acceleration term, and reports orientation as both quaternion
 and Euler-angle data.
 
-On the #gls("i2c") bus, the BNO055 uses one of two fixed addresses, selected by the level of the COM3 pin. The 8-bit address is 0x52 when the pin is high and 0x50 when it is low. On this platform, COM3 is tied low on the #gls("pcb"), and the firmware therefore addresses the device at 0x50. During startup, the firmware first reads the fixed chip identification value and issues a hardware reset only if this check fails. A reset requires approximately one second, whereas a device that is already running responds immediately.
+On the #gls("i2c") bus, the BNO055 uses one of two fixed addresses, selected by the level of the COM3 pin. The 8-bit address is 0x52 when the pin is high and 0x50 when it is low @BNO0552021. On this platform, COM3 is tied low on the #gls("pcb"), and the firmware therefore addresses the device at 0x50. During startup, the firmware first reads the fixed chip identification value and issues a hardware reset only if this check fails. A reset requires approximately one second, whereas a device that is already running responds immediately.
 
 The driver of this platform does not read the Euler angle heading register of the BNO055 directly. Euler angle representations lose a degree of freedom at their singularity and jump at the wrap-around of their range, an effect known as gimbal lock @Diebel2006. The datasheet's own Euler output reflects that limit, with roll restricted to $plus.minus$90° @BNO0552021. The driver reads the quaternion output instead, which the register map scales with 16384 #gls("lsb") per unit quaternion component, and derives the yaw angle from the resulting w, x, y, and z values using a two-argument arctangent.
 Yaw rate is read directly from the gyroscope's Z-axis
@@ -142,7 +142,7 @@ analog input pins of the microcontroller. The available number of channels excee
   caption: [ADS7128, WQFN-16 package #imgsrc(<TIADS7128ProductPage2026>)],
 ) <fig:ads7128>
 
-The address of the ADS7128 is selected by a pair of external resistors on the ADDR pin, which allows one of eight addresses to be configured. The firmware implementation and the channel assignment used on this platform are described in @sec:adc-handling.
+The address of the ADS7128 is selected by a pair of external resistors on the ADDR pin, which allows one of eight addresses to be configured @ADS71282020. The firmware implementation and the channel assignment used on this platform are described in @sec:adc-handling.
 
 === Wheel-speed Sensor (TLE4966L) <sec:hall>
 
@@ -160,7 +160,7 @@ IC in a four-lead PG-SSO-4-1 package @TLE4966L2020. The device is mounted adjace
   caption: [TLE4966L, PG-SSO-4-1 package, and the RPM sensor board carrying it #imgsrc(<InfineonTLE4966LProductPage2026>, <KrennRPMSensor2026>)],
 ) <fig:tle4966l>
 
-The TLE4966L differs from a simple Hall switch in providing a second output that indicates the direction of rotation in addition to the speed pulse.
+The TLE4966L differs from a simple Hall switch in providing a second output that indicates the direction of rotation in addition to the speed pulse @TLE4966L2020.
 A simple switch provides only the rotational speed, not its direction. This platform uses the second signal because the speed controller requires the distinction between forward and reverse motion.
 
 == Motor Drivers (BTN9970LV) <sec:motor-drivers>
@@ -177,11 +177,11 @@ in one automotive-qualified package, shown in @fig:btn9970lv.
 
 Each driver takes two digital inputs. IN selects which side of the
 half-bridge conducts, fast enough to be driven straight from a #gls("pwm")
-signal, and INH enables the device or sets both sides to high impedance. Two of these drivers form a full H-bridge, which is the configuration used on this platform, with one IC connected to each motor terminal. Direction and speed are therefore set through the combination of both drivers. The firmware implementation is described in @sec:actuator-control.
+signal, and INH enables the device or sets both sides to high impedance @BTN9970LV2021. Two of these drivers form a full H-bridge, which is the configuration used on this platform, with one IC connected to each motor terminal. Direction and speed are therefore set through the combination of both drivers. The firmware implementation is described in @sec:actuator-control.
 
 Each driver also reports its high-side load current on an IS pin. The
 platform reads one such signal per motor terminal, each on a separate #gls("adc") channel, as
-@sec:adc-handling describes. Protection against overcurrent, overtemperature, and undervoltage is implemented in the driver itself and requires no support from the firmware.
+@sec:adc-handling describes. Protection against overcurrent, overtemperature, and undervoltage is implemented in the driver itself and requires no support from the firmware @BTN9970LV2021.
 
 == WiFi Bridge (ESP8266) <sec:esp-bridge>
 
