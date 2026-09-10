@@ -29,4 +29,4 @@ reproduzierbaren Test- und Tuning-Workflow unterstützt. Sie löst damit den
 langsamen Zyklus aus Editieren, Kompilieren und Neuflashen der vorherigen
 Generation ab. In den aufgezeichneten Testfahrten wurden 134 von 137 Runden als
 gültig gewertet. Bei gleicher Geschwindigkeitseinstellung lag die Rundenzeit im
-Mittel bei 10,55 s mit einer Standardabweichung von 0,10 s.
+Mittel bei 10,54 s mit einer Standardabweichung von 0,09 s.

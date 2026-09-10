@@ -35,17 +35,19 @@ testsuite provide the quantitative measures. @sec:turn-performance reports them.
 
 The front ToF sensor, running at 33 Hz with its narrow 4 × 4 ROI, reached a
 maximum usable range of 2.9 m on the track. Within that range
-its readings were accurate and reliable throughout testing. The car has a low
+its readings were stable and plausible throughout testing. The car has a low
 ride height, and even the minimum 15° FoV of the 4 × 4 ROI still receives
 ground reflections at longer range. A longer timing budget and a wider ROI
 both left this limit unchanged, so it follows from the mounting height of the
 sensor rather than from its timing or ROI settings.
 
 The side ToF sensors range over much shorter distances and performed well
-throughout testing. They use the 10 × 10 ROI of the short mode described in
-@sec:tof, which reads a subset of the full 16 × 16 SPAD array. The
-corner-slope detection from @sec:turn-rate-threshold remained stable on these
-readings, and neither sensor showed further issues.
+throughout testing. Their ROI was settled during the evaluation rather than
+fixed beforehand. It was first narrowed from the full 16 × 16 SPAD array to
+8 × 8, and then widened to the 10 × 10 of the short mode described in
+@sec:tof. The wider window keeps enough of the field of view on the wall
+beside the car. The corner-slope detection from @sec:turn-rate-threshold
+remained stable on the final readings, and neither sensor showed issues.
 
 The IMU held a stable heading and yaw rate across all runs. The only deviation
 observed was a small negative offset on the linear acceleration Z axis. It
@@ -54,8 +56,10 @@ and magnetometer inputs of the fusion algorithm should already remove. The X
 and Y linear acceleration axes remained stable and showed no such offset. The
 firmware does not read the Z axis, so the offset had no effect on driving.
 
-The ADC readings for battery voltage and motor current were accurate and
-stable throughout the evaluation.
+The ADC readings for battery voltage and motor current were stable and
+plausible throughout the evaluation. The battery voltage was additionally
+compared against a multimeter, which confirmed the divider conversion
+described in @sec:adc-handling.
 
 == State Machine and Turn Detection Performance <sec:turn-performance>
 
@@ -78,23 +82,29 @@ behavior that follows it repeated consistently.
 ) <fig:lap-overlay>
 
 Lap timing from the same runs quantifies that consistency. Of the 70 laps, 59
-were driven at one speed setting, and @tbl:lap-consistency summarizes them.
-Lap time stayed within 0.10 s of a mean of 10.55~s, which is about one percent,
-and the driven distance stayed within 0.28 m of a mean of 15.26 m. The
-remaining 11 laps covered the same distance at a lower average speed.
+were driven at one speed setting. Four of those contain short gaps in the
+tracking data, where the car moved further than the recorded positions
+account for, so @tbl:lap-consistency covers the remaining 55.
+Lap time averaged 10.54~s with a standard deviation of 0.09 s, about one
+percent of the mean. The driven distance averaged 15.31 m with a standard
+deviation of 0.12 m. The 11 laps at the lower setting covered the same distance at average
+speeds between 0.72 m/s and 1.05 m/s, against 1.45 m/s across the other 59. All
+11 were valid, and the detection threshold from @sec:turn-rate-threshold was
+unchanged throughout. Corner detection therefore held over a twofold range of
+speed on a single threshold.
 
 #figure(
   fhjtable(
     tabledata: (
       ("Measure", "Mean", "Standard deviation", "Range"),
-      ("Lap time", "10.55 s", "0.10 s", "10.34 to 10.84 s"),
-      ("Driven distance", "15.26 m", "0.28 m", "13.90 to 15.59 m"),
-      ("Average speed", "1.45 m/s", "0.03 m/s", "1.29 to 1.48 m/s"),
+      ("Lap time", "10.54 s", "0.09 s", "10.34 to 10.78 s"),
+      ("Driven distance", "15.31 m", "0.12 m", "15.04 to 15.59 m"),
+      ("Average speed", "1.45 m/s", "0.01 m/s", "1.43 to 1.48 m/s"),
     ),
     columns: 4,
   ),
   kind: table,
-  caption: [Lap consistency across the 59 laps driven at one speed setting],
+  caption: [Lap consistency across the 55 gap-free laps driven at one speed setting],
 ) <tbl:lap-consistency>
 
 Lap validity provides a completion measure across every recorded session.
@@ -173,7 +183,7 @@ cutting both traces and bridging them across with a short length of solder
 wire. This restored SDA and SCL to their correct pins, so the IMU from
 @sec:imu joined the bus in the same way as the other I2C1 devices.
 
-=== Missing ESP8266-12F <sec:pcb-esp8266>
+=== Missing Footprint for the WiFi Bridge <sec:pcb-esp8266>
 
 The main PCB was laid out before wireless communication with the car was
 foreseen, so it provides no footprint for the WiFi bridge from

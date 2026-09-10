@@ -31,7 +31,10 @@ Reliable detection of both the 90° corners and the 180° hairpins in
 than on elapsed time meant that one threshold worked at both speeds the
 detector runs under. @sec:states-transitions describes these as the full
 speed of `CAR_FULL_THROTTLE` and the moderate speed of `CAR_STRAIGHT`. A
-separate threshold for either was therefore unnecessary.
+separate threshold for either was therefore unnecessary. The lap log extends
+this beyond the two internal speeds. Eleven of the 70 laps ran at half to three
+quarters of the usual speed and stayed valid on the same threshold, as
+@sec:turn-performance reports.
 
 `CAR_RECOVER` is the one autonomous-loop state that fell short of that
 reliability, since it needed several attempts in some cases. The tuning
