@@ -12,6 +12,14 @@ review, alongside the position of the car as measured by the OptiTrack system
 of the laboratory. That position is independent of the dead reckoning that the
 firmware computes on board.
 
+The recorded material comes from runs between July and August 2026 and holds
+137 laps in total. One log covers a continuous week of testing and contributes
+70 of them, which is the largest set driven on one track layout and therefore
+the set used for the path and timing results in @sec:turn-performance. Within
+those 70 laps, 59 share one speed setting and support the timing comparison.
+The remaining laps come from shorter runs at other configurations and enter
+only the lap completion count.
+
 The evaluation is largely qualitative. Sensor readings were judged by inspecting the
 logged telemetry for stable and plausible values. @sec:sensor-performance
 reports the behavior observed in these logs. Turn detection and state machine
@@ -19,8 +27,8 @@ behavior were assessed in the same way, by observing repeated runs and noting
 where a corner was missed or falsely triggered. The usability of the tuning
 workflow was judged against the wired-debugger reflash cycle that this project
 used before the GET/SET protocol was in place. @sec:workflow describes the
-workflow that replaced it. Lap timing recorded by the testsuite provides the
-one quantitative measure. @sec:turn-performance reports it.
+workflow that replaced it. Lap timing and lap validity recorded by the
+testsuite provide the quantitative measures. @sec:turn-performance reports them.
 
 == Sensor Performance <sec:sensor-performance>
 
@@ -57,9 +65,9 @@ shifted the readings of the sensors. The slope threshold from
 @sec:turn-rate-threshold had to be retuned with them, and every corner on the
 track was detected after that retuning.
 
-@fig:lap-overlay overlays the tracked path of 70 recorded laps on the manually
-defined circuit from @sec:ai-motionlab-role. The laps were driven across
-several sessions and at different tuning states. Through every 90° corner and
+@fig:lap-overlay overlays the tracked path of those 70 laps on the manually
+defined circuit from @sec:ai-motionlab-role. They were driven across several
+sessions and at different tuning states. Through every 90° corner and
 both hairpins the paths form a narrow bundle, so detection and the exit
 behavior that follows it repeated consistently.
 
@@ -87,6 +95,12 @@ remaining 11 laps covered the same distance at a lower average speed.
   kind: table,
   caption: [Lap consistency across the 59 laps driven at one speed setting],
 ) <tbl:lap-consistency>
+
+Lap validity provides a completion measure across every recorded session.
+Across all 137 laps, the lap timing of the testsuite marked 134 as
+valid. A lap is valid only when the car crosses every sector boundary in order,
+without reversing or skipping one. Of the three invalid laps, two cover well
+beyond the usual lap distance and one ends after the first sector.
 
 `CAR_RECOVER`, introduced in @sec:flag-events, was the least refined of the
 driving states. Freeing a stuck car sometimes took two or three attempts,

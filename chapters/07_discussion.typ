@@ -55,10 +55,10 @@ The evaluation itself carries a limitation. @sec:eval-methodology judged
 sensor readings, turn detection, and recovery behavior by inspecting logged
 telemetry and observing repeated runs, rather than through a statistically
 designed measurement campaign. The findings in @ch:evaluation therefore
-describe what was observed across those runs, not a quantified error rate or
-a confidence interval. Lap timing is the exception, and it measures the
-repeatability of a completed lap rather than the detection rate of an
-individual corner.
+describe what was observed across those runs. Lap timing and lap validity are
+the exception, and they measure the repeatability and the completion of a whole
+lap. The detection rate of an individual corner and the accuracy of an
+individual sensor reading remain unquantified.
 
 Two behaviors observed during the evaluation remain current limitations
 rather than solved problems. @sec:turn-performance and
