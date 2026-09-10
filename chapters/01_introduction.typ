@@ -115,7 +115,7 @@ The following are explicitly out of scope for this thesis:
 
 == Thesis Structure <sec:thesis-structure>
 
-@ch:hardware describes the underlying hardware baseline from the chassis and the main #gls("pcb") to the STM32H533RE microcontroller, the sensor suite, and the motor drivers. It also covers the #gls("pcb") oversights found during this work. @ch:firmware-sensors describes the structure of the application, the sensor drivers, and actuator control. @ch:firmware-state-machine describes the driving state machine, its flag-based event mechanism, and the turn detection algorithm.
+@ch:hardware describes the underlying hardware baseline from the chassis and the main #gls("pcb") to the STM32H533RE microcontroller, the sensor suite, and the motor drivers. @ch:firmware-sensors describes the structure of the application, the sensor drivers, and actuator control. @ch:firmware-state-machine describes the driving state machine, its flag-based event mechanism, and the turn detection algorithm.
 @ch:integration investigates the connection between firmware and the AI-MotionLab testsuite using the existing communication infrastructure, and which telemetry and parameter interfaces are used. The testsuite itself is covered only with respect to that context.
 @ch:evaluation reports on the
 platform's sensor performance, state machine and turn detection behavior,

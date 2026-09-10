@@ -108,7 +108,7 @@ the BNO055, so that the sensor starts up correctly without a solder bridge.
 
 The ESP8266 module from @sec:pcb-esp8266 should receive a dedicated on-board
 footprint. A jumper should still be able to disconnect the STM32-ESP8266 bus
-entirely, because the Crazy Car race rules forbid wireless communication
+entirely, because the CrazyCar race rules forbid wireless communication
 during a race. The link serves testing and tuning rather than competition
 runs.
 
@@ -119,7 +119,7 @@ firmware enables it.
 The pin layout from @sec:pcb-pin-layout requires a broader revision. The
 Nucleo board should be mounted right side up, which would let it fit better
 under the cover of the car. The main PCB currently exposes only the Arduino
-Uno R4 header set. The ST Morpho headers of the Nucleo board carry the
+UNO R4 header set. The ST Morpho headers of the Nucleo board carry the
 remaining pins of the STM32 and should be connected as well.
 
 Two further details belong in the same revision. The Hall sensor connector

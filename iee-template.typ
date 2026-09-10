@@ -491,6 +491,13 @@ long }
   set page(numbering: "1")
   counter(page).update(1)
   set heading(numbering: "1.1.1")
+  // References to a level-1 heading read "Chapter 3", references to a deeper
+  // heading read "Section 3.2.1". Without this, Typst supplements every
+  // heading reference with "Section", regardless of level.
+  set heading(supplement: if is-german [Abschnitt] else [Section])
+  show heading.where(level: 1): set heading(
+    supplement: if is-german [Kapitel] else [Chapter]
+  )
 
   body
 }

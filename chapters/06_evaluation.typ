@@ -124,7 +124,7 @@ board rather than fitted to a dedicated footprint on the main PCB.
 
 === STM32 Pin Layout <sec:pcb-pin-layout>
 
-The Arduino-style headers of the main PCB were laid out for an Arduino Uno R4
+The Arduino-style headers of the main PCB were laid out for an Arduino UNO R4
 pin arrangement, while the Nucleo-H533RE board from @sec:mcu is oriented in
 the opposite direction. The Nucleo board therefore has to be seated upside
 down. In that position its built-in Reset and User buttons press against the

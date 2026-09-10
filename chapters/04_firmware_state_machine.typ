@@ -85,7 +85,7 @@ marks it as forward or reverse. When the mode starts, the firmware validates
 the path before it accepts it. The path must contain at least two points, every
 direction flag must be valid, and consecutive points must lie within a maximum
 spacing. The firmware also splits the path into segments wherever the direction
-changes, so that a forward section and a following reverse section become
+changes, so that a forward stretch and a following reverse stretch become
 separate segments. If any check fails, the request is refused and the car
 remains stationary.
 

@@ -7,19 +7,18 @@
 
 The hardware of this thesis builds on the XRAY M18 Pro LiPo shown in
 @fig:chassis, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from
-XRAY @MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase of 150 mm and
-a weight of approximately 165 g. The main chassis plate is #gls("cnc")-machined
+XRAY @MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase of 150 mm.
+The kit weighs 165 g, and 440 g in ready-to-run configuration. The main chassis plate is #gls("cnc")-machined
 from 1.6 mm carbon fiber, thin enough to flex a little on a low-grip
 surface but stiff enough to hold its line at higher speeds. XRAY's Multi-Flex
 top deck enables that flex to be tuned separately at the front and
 rear axle, a feature carried over from XRAY's 1/10-scale touring cars.
 
 Two characteristics of the M18 Pro are relevant to its use in CrazyCar. First, the
-drivetrain and suspension are fully adjustable. The setup additionally offers composite ball
-differentials at both axles, a 1:2.5 drive ratio with changeable 36T and
-42T spur gears and a range of pinions, and coil-over shocks with adjustable
-camber, caster, and toe. That range covers setups from fast and predictable on smooth indoor surfaces to more compliant configurations for rougher tracks. Second, the kit is available standalone. That bare state leaves room to build a
-fully custom electronics platform, exactly what this project set out to do.
+drivetrain and suspension are fully adjustable, including ball differentials at
+both axles, changeable gearing, and coil-over shocks with adjustable camber,
+caster, and toe. Second, the kit is available standalone, which leaves room for
+a fully custom electronics platform.
 
 
 #figure(
@@ -83,8 +82,10 @@ matters on a track where the car measures its distance to wooden barriers.
 Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address, so the three sensors cannot share a single bus without further measures. Each sensor provides an active-low XSHUT pin that holds it in standby. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
 
 Ranging is tuned through three settings. The distance mode trades range against
-immunity to ambient light, reaching up to 3.6 m in the dark in long mode but
-around 1.35 m in short mode regardless of lighting conditions. The timing budget defines the
+immunity to ambient light. Long mode reaches the maximum ranging distance of
+4 m in the dark. Short mode is
+limited to approximately 1.35 m
+@VL53L1X2024. The timing budget defines the
 duration of a measurement, trading range and repeatability against the ranging rate.
 The #gls("roi") restricts the active part of the 16 × 16 #gls("spad") array,
 which narrows the diagonal #gls("fov") from 27° down to as little as 15°.
@@ -119,7 +120,7 @@ separates the accelerometer's raw signal into a gravity vector and a
 linear acceleration term, and reports orientation as both quaternion
 and Euler-angle data.
 
-On the #gls("i2c") bus, the BNO055 uses one of two fixed addresses, selected by the level of the COM3 pin. The address is 0x29 when the pin is high and 0x28 when it is low. On this platform, COM3 is tied low on the #gls("pcb"), and the firmware therefore addresses the device at 0x28. During startup, the firmware first reads the fixed chip identification value and issues a hardware reset only if this check fails. A reset requires approximately one second, whereas a device that is already running responds immediately.
+On the #gls("i2c") bus, the BNO055 uses one of two fixed addresses, selected by the level of the COM3 pin. The 8-bit address is 0x52 when the pin is high and 0x50 when it is low. On this platform, COM3 is tied low on the #gls("pcb"), and the firmware therefore addresses the device at 0x50. During startup, the firmware first reads the fixed chip identification value and issues a hardware reset only if this check fails. A reset requires approximately one second, whereas a device that is already running responds immediately.
 
 The driver of this platform does not read the Euler angle heading register of the BNO055 directly. Euler angle representations lose a degree of freedom at their singularity and jump at the wrap-around of their range, an effect known as gimbal lock @Diebel2006. The datasheet's own Euler output reflects that limit, with roll restricted to $plus.minus$90° @BNO0552021. The driver reads the quaternion output instead, which the register map scales with 16384 #gls("lsb") per unit quaternion component, and derives the yaw angle from the resulting w, x, y, and z values using a two-argument arctangent.
 Yaw rate is read directly from the gyroscope's Z-axis
@@ -132,11 +133,9 @@ physical sensors, with a value of 3 indicating full calibration and 0 indicating
 
 === ADC (ADS7128) <sec:adc>
 
-The external ADC of the platform is a Texas Instruments ADS7128, shown in @fig:ads7128. It is an 8-channel multiplexed 12-bit #gls("sar") ADC in a 3 mm × 3 mm 16-pin WQFN package @ADS71282020. Each of the eight channels can be configured independently as an analog input, a digital input, or a GPIO output. An internal oscillator drives the conversion process, so that no clock signal is required from the host. As noted in @sec:mcu, the
-STM32H533RE has only two internal ADCs of its
-own, while the ADS7128 listens on the same I2C bus as the
-rest of the sensor stack and adds eight more channels
-without using any of the microcontroller's built-in ADC pins. The available number of channels exceeds the requirements of this platform.
+The external ADC of the platform is a Texas Instruments ADS7128, shown in @fig:ads7128. It is an 8-channel multiplexed 12-bit #gls("sar") ADC in a 3 mm × 3 mm 16-pin WQFN package @ADS71282020. Each of the eight channels can be configured independently as an analog input, a digital input, or a GPIO output. An internal oscillator drives the conversion process, so that no clock signal is required from the host. The device is connected to the same I2C bus as the
+rest of the sensor stack, so its eight channels are available without occupying
+analog input pins of the microcontroller. The available number of channels exceeds the requirements of this platform.
 
 #figure(
   image("/assets/pictures/ads7128.png", width: 50%),

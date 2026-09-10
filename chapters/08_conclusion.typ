@@ -65,5 +65,5 @@ This thesis leaves a CrazyCar that can be driven, observed, and tuned
 entirely from a laptop at the side of the track. The main #gls("pcb") it runs
 on has been brought up and documented for the first time. Together these make
 the platform ongoing research infrastructure rather than a single bring-up
-exercise, ready for the next student, thesis, or Crazy Car competition team
+exercise, ready for the next student, thesis, or CrazyCar competition team
 to build on.
