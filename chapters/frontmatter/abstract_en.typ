@@ -23,4 +23,6 @@ oversights on the main board, which are documented as part of the evaluation.
 
 The result is a CrazyCar platform that drives autonomously and supports a fast,
 reproducible test and tuning workflow, replacing the slow edit, compile, and
-reflash cycle of the earlier generation.
+reflash cycle of the earlier generation. Across the recorded runs, 134 of 137
+laps were valid. At one speed setting the lap time averaged 10.55 s with a
+standard deviation of 0.10 s.
