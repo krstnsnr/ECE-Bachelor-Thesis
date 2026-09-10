@@ -1,3 +1,5 @@
+#import "/helpers/lib.typ": fhjtable
+
 = Evaluation <ch:evaluation>
 
 == Evaluation Methodology <sec:eval-methodology>
@@ -8,14 +10,15 @@ drove the autonomous loop over the manually defined circuit described in
 during every run, and the session logs of the testsuite captured it alongside
 the tracked position of the car for later review.
 
-The evaluation is qualitative. Sensor readings were judged by inspecting the
+The evaluation is largely qualitative. Sensor readings were judged by inspecting the
 logged telemetry for stable and plausible values. @sec:sensor-performance
 reports the behavior observed in these logs. Turn detection and state machine
 behavior were assessed in the same way, by observing repeated runs and noting
 where a corner was missed or falsely triggered. The usability of the tuning
 workflow was judged against the wired-debugger reflash cycle that this project
 used before the GET/SET protocol was in place. @sec:workflow describes the
-workflow that replaced it.
+workflow that replaced it. Lap timing recorded by the testsuite provides the
+one quantitative measure. @sec:turn-performance reports it.
 
 == Sensor Performance <sec:sensor-performance>
 
@@ -51,6 +54,37 @@ were detected. The side ToF ROI changes reported in @sec:sensor-performance
 shifted the readings of the sensors. The slope threshold from
 @sec:turn-rate-threshold had to be retuned with them, and every corner on the
 track was detected after that retuning.
+
+@fig:lap-overlay overlays the tracked path of 70 recorded laps on the manually
+defined circuit from @sec:ai-motionlab-role. The laps were driven across
+several sessions and at different tuning states. Through every 90° corner and
+both hairpins the paths form a narrow bundle, so detection and the exit
+behavior that follows it repeated consistently.
+
+#figure(
+  image("/assets/graphics/selfdrawn/lap_path_overlay.svg", width: 100%),
+  caption: [Tracked path of 70 laps overlaid on the circuit outline],
+) <fig:lap-overlay>
+
+Lap timing from the same runs quantifies that consistency. Of the 70 laps, 59
+were driven at one speed setting, and @tbl:lap-consistency summarizes them.
+Lap time stayed within 0.10 s of a mean of 10.55 s, which is about one percent,
+and the driven distance stayed within 0.28 m of a mean of 15.26 m. The
+remaining 11 laps covered the same distance at a lower average speed.
+
+#figure(
+  fhjtable(
+    tabledata: (
+      ("Measure", "Mean", "Standard deviation", "Range"),
+      ("Lap time", "10.55 s", "0.10 s", "10.34 to 10.84 s"),
+      ("Driven distance", "15.26 m", "0.28 m", "13.90 to 15.59 m"),
+      ("Average speed", "1.45 m/s", "0.03 m/s", "1.29 to 1.48 m/s"),
+    ),
+    columns: 4,
+  ),
+  kind: table,
+  caption: [Lap consistency across the 59 laps driven at one speed setting],
+) <tbl:lap-consistency>
 
 `CAR_RECOVER`, introduced in @sec:flag-events, was the least refined of the
 driving states. Freeing a stuck car sometimes took two or three attempts,
