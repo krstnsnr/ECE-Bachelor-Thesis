@@ -111,7 +111,9 @@ parses the value and requires the whole token to be a valid number. It then
 checks that the value is finite and within a fixed range. A value that passes
 is written, and the car replies `OK`. A value that fails leaves the field
 unchanged, and the car replies with an error. Because the check runs on the
-car, only a valid value ever reaches a parameter.
+car, only a valid value ever reaches a parameter. This validation is part of
+the command handler described in @sec:car-comm-module and is Polivka's work
+@PolivkaTestsuite2026.
 
 Live tuning follows from this mechanism. The steering and throttle PID gains
 are parameters, and @sec:actuator-control describes how the state machine

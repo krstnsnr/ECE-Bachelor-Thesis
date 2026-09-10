@@ -7,7 +7,7 @@
 The driving logic is implemented as a finite state machine. It runs once per
 control-loop tick at 100 Hz. Each tick first executes the action of the current
 state and then evaluates the transition conditions for the next tick. The
-current state is mirrored into a telemetry global, so that the PC side
+current state is mirrored into a telemetry global, so that the PC-side
 testsuite can observe the behavior of the car in real time. Nine states are
 defined.
 
@@ -49,7 +49,7 @@ Some conditions have to override the normal state flow regardless of the
 current state. An event module running alongside the state machine handles
 them and reports its results as flags. The module covers three events, namely
 a low battery, a crash, and a stuck car. The most severe active event is
-mirrored into a telemetry global, so that the PC side testsuite can display
+mirrored into a telemetry global, so that the PC-side testsuite can display
 it.
 
 The state machine checks these flags at the start of every tick, before it
