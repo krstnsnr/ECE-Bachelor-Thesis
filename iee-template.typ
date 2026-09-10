@@ -341,7 +341,14 @@ long }
 
     heading(outlined: false, numbering: none, "Declaration of Honor")
     include "chapters/frontmatter/declaration_of_honor.typ"
-  
+
+    // ==========================================================
+    // AI DISCLAIMER
+    // ==========================================================
+
+    heading(outlined: false, numbering: none, "Disclaimer: Use of AI")
+    include "chapters/frontmatter/ai_disclaimer.typ"
+
 
     // ==========================================================
     // ABSTRACTS
