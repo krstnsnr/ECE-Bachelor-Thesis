@@ -26,7 +26,7 @@ session logging run alongside these docks.
 
 Only a few of these panels reach the firmware directly, and they all use the
 same text protocol over the WiFi bridge. The rest of this chapter follows that
-protocol from the car side. 
+protocol from the car side.
 
 == Car Communication Module <sec:car-comm-module>
 

@@ -124,20 +124,19 @@ board rather than fitted to a dedicated footprint on the main PCB.
 
 === STM32 Pin Layout <sec:pcb-pin-layout>
 
-The main PCB's Arduino-style headers were laid out for an Arduino Uno R4 pin
-arrangement, while the Nucleo-H533RE board from @sec:mcu mounts the other
-way round. Fitting the Nucleo board to the main PCB therefore means seating
-it upside down rather than right side up. Mounted that way, the Nucleo's
-built-in Reset and User buttons land where the main PCB gets in the way, so
-both buttons had to be trimmed down to make the board fit.
+The Arduino-style headers of the main PCB were laid out for an Arduino Uno R4
+pin arrangement, while the Nucleo-H533RE board from @sec:mcu is oriented in
+the opposite direction. The Nucleo board therefore has to be seated upside
+down. In that position its built-in Reset and User buttons press against the
+main PCB, so both buttons had to be trimmed for the board to sit flush.
 
 === Missing Pulldown on the ESC INH Pin <sec:pcb-esc-pulldown>
 
 The main PCB has no pulldown resistor on D6, the Nucleo header pin that
 drives the shared INH input of the two BTN9970LV half-bridge drivers from
-@sec:motor-drivers. Without one, the pin floats until the firmware's GPIO
-initialization runs and drives it to a known level. This showed up directly
-during debugging. Flashing over the wired debugger in VS Code halts the STM32
-at reset by default, before `HAL_Init()` runs, and D6 floats in that pause,
-so the motor driver reads it as enabled and the motor starts turning with no
-code yet in control of it.
+@sec:motor-drivers. The pin therefore floats until the GPIO initialization of
+the firmware runs and drives it to a known level. This became visible during
+debugging. Flashing over the wired debugger in VS Code halts the STM32 at
+reset by default, before `HAL_Init()` runs. D6 floats during that pause, so
+the motor driver reads it as enabled and the motor starts turning before any
+firmware controls it.
