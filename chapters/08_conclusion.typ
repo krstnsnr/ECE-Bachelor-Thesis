@@ -33,7 +33,8 @@ delivered the following results:
 - An evaluation of the resulting platform, reported in @ch:evaluation, that
   covers sensor and state machine performance, the usability of the tuning
   workflow, and the #gls("pcb") oversights found while bringing the board
-  up.
+  up. Across 137 recorded laps, 134 were valid, and at one speed setting the
+  lap time averaged 10.54 s with a standard deviation of 0.09 s.
 
 Together these results close the gap identified by the problem statement in
 @sec:problem-statement. The CrazyCar hardware baseline now has firmware that

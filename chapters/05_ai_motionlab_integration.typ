@@ -55,8 +55,8 @@ same wire format.
 
 The protocol is existing infrastructure on both ends. The testsuite module,
 the OTA tool, and the framing and dispatch code in the car are Polivka's work
-@PolivkaTestsuite2026. This thesis contributes the fields that travel over it,
-which @sec:telemetry-display describes.
+@PolivkaTestsuite2026. This thesis contributes the field entries that travel
+over it, which @sec:telemetry-display describes.
 
 == Live Telemetry Display <sec:telemetry-display>
 
@@ -71,7 +71,11 @@ Each entry is a name and a pointer to a global variable, and the table that
 holds a field sets its permission. A sensor field can therefore only be read,
 while a parameter can also be written. The sensor drivers, control loop, and
 state machine write into these globals on every tick, and the command handler
-reads or writes them by name when a request arrives.
+reads or writes them by name when a request arrives. The table mechanism
+itself belongs to the protocol infrastructure from @sec:car-comm-module. The
+entries in it are the contribution of this work, namely the sensor readings,
+the PID gains, and the state and event values that the firmware modules
+described in @ch:firmware-sensors and @ch:firmware-state-machine expose.
 
 The testsuite shows the sensor fields in a live table with one row per field.
 It refreshes the table on demand or polls it continuously. Values arrive as

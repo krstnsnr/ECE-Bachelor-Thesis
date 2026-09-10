@@ -18,8 +18,9 @@ One of these logs, kept over one week of testing, contributes 70 laps. That is
 the largest set driven, so it provides the path and timing
 results in @sec:turn-performance. Within those 70 laps, 59 share one speed
 setting and support the timing comparison.
-The remaining laps come from shorter runs at other configurations and enter
-only the lap completion count.
+The remaining laps come from shorter runs at other speed settings
+and enter only the lap completion count. All 137 laps were driven on the same
+circuit.
 
 The evaluation is largely qualitative. Sensor readings were judged by inspecting the
 logged telemetry for stable and plausible values. @sec:sensor-performance
@@ -87,11 +88,12 @@ tracking data, where the car moved further than the recorded positions
 account for, so @tbl:lap-consistency covers the remaining 55.
 Lap time averaged 10.54~s with a standard deviation of 0.09 s, about one
 percent of the mean. The driven distance averaged 15.31 m with a standard
-deviation of 0.12 m. The 11 laps at the lower setting covered the same distance at average
-speeds between 0.72 m/s and 1.05 m/s, against 1.45 m/s across the other 59. All
-11 were valid, and the detection threshold from @sec:turn-rate-threshold was
-unchanged throughout. Corner detection therefore held over a twofold range of
-speed on a single threshold.
+deviation of 0.12 m. The remaining 11 laps were driven at several lower
+settings. They covered the same distance at average speeds from 0.72 m/s to
+1.05 m/s, against 1.45 m/s at the higher setting. All 11 were valid, and the
+detection threshold from @sec:turn-rate-threshold was unchanged throughout.
+Corner detection therefore held on a single threshold across speeds that differ
+by a factor of two.
 
 #figure(
   fhjtable(

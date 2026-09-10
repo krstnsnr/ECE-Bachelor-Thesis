@@ -32,9 +32,9 @@ than on elapsed time meant that one threshold worked at both speeds the
 detector runs under. @sec:states-transitions describes these as the full
 speed of `CAR_FULL_THROTTLE` and the moderate speed of `CAR_STRAIGHT`. A
 separate threshold for either was therefore unnecessary. The lap log extends
-this beyond the two internal speeds. Eleven of the 70 laps ran at half to three
-quarters of the usual speed and stayed valid on the same threshold, as
-@sec:turn-performance reports.
+this beyond the two internal speeds. Eleven of the 70 laps ran at several lower
+settings, from half to three quarters of the usual speed, and stayed valid on
+the same threshold, as @sec:turn-performance reports.
 
 `CAR_RECOVER` is the one autonomous-loop state that fell short of that
 reliability, since it needed several attempts in some cases. The tuning
@@ -145,9 +145,9 @@ pin floating, a sequence that reading the schematic alone would not have
 revealed. Hands-on bring-up therefore takes time that a schematic review
 cannot replace.
 
-Benedikt Polivka built the telemetry and parameter tables in
-@sec:telemetry-display as generic named fields rather than as a separate
-protocol message for each sensor or gain @PolivkaTestsuite2026. That decision
+Benedikt Polivka designed the telemetry and parameter tables in
+@sec:telemetry-display around generic named fields rather than around a
+separate protocol message for each sensor or gain @PolivkaTestsuite2026. That decision
 proved central to this work. Every sensor from @ch:hardware and every PID
 gain from @sec:actuator-control became visible to the testsuite through the
 same `GET`/`SET` command handler, without additional protocol code on either
@@ -165,14 +165,17 @@ returned more than the same effort spent on gain derivation.
 The distance-normalized slope of the turn detector in
 @sec:turn-rate-threshold is a broader lesson about designing a detector
 around what stays constant in the physical situation rather than around the
-raw time series of a sensor. One threshold then covers every speed the car
-reaches.
+raw time series of a sensor. One threshold then holds across a range of speeds
+rather than at a single one. The evaluation in @sec:turn-performance covers
+speeds that differ by a factor of two, and the principle is expected to extend
+beyond that range.
 
 The same principle, treating a single sample as provisional until it is
-confirmed, reappears elsewhere in the firmware. The two-tick confirmation of
-the slope test, the half-second debounce on the crash and stuck events in
-@sec:flag-events, and the discarded implausible IMU sample in
-@sec:heading-delta all reject a single noisy reading in the same way.
+confirmed, reappears elsewhere in the firmware. The slope test and the crash
+detector each confirm their trigger over consecutive ticks. The low-battery
+and stuck detectors in @sec:flag-events require their condition to hold for
+half a second. The implausible IMU sample in @sec:heading-delta is discarded
+outright. Each of these rejects a single noisy reading in the same way.
 
 This firmware and the AI-MotionLab testsuite were developed in parallel, as
 @sec:ai-motionlab-role describes. The GET/SET protocol and the telemetry
