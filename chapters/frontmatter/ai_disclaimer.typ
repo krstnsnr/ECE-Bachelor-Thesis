@@ -2,10 +2,17 @@
 
 == Use of AI in the Written Part of this Thesis
 
-Artificial Intelligence (AI) was used during the work on this thesis. This
-thesis was spell checked, edited, and grammar enhanced by Anthropic's Claude
-Opus 5 Large Language Model throughout. Every suggestion was reviewed and
-corrected where necessary. 
+Artificial Intelligence (AI) was used during the work on this thesis.
+Anthropic's Claude Opus 5 Large Language Model was used for the following
+purposes:
+
+- Spell checking, grammar correction, and language editing throughout the
+  document.
+- Rewriting and restructuring passages written by the author, including
+  shortening them and reordering sections.
+
+This list covers every use of AI in the written part. Every suggestion was
+reviewed and corrected where necessary.
 
 == Use of AI in the Practical Part of this Thesis
 
