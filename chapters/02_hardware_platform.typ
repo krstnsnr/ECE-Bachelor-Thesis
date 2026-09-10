@@ -49,7 +49,7 @@ development board carrying an STM32H533RET6 microcontroller
 ) <fig:nucleo-board>
 
 The STM32H533RE is based on an Arm Cortex-M33 core with a hardware floating-point unit, clocked at up to 250 MHz @STM32H533xx2026. It provides 512 KB of flash and 272 KB of #gls("sram"). This exceeds the requirements of the sensor drivers, control loop, state machine, and telemetry stack implemented here, leaving headroom for future extensions.
-The #gls("i2c") buses connect the ADS7128 ADC, the BNO055 #gls("imu"), and the VL53L1X distance sensors. A #gls("usart") carries the traffic of the ESP8266 WiFi bridge, and the #gls("pwm") timers drive the motor and steering actuators. The corresponding firmware implementation is described in @sec:i2c-stack and @sec:actuator-control.
+The #gls("i2c") bus connects the ADS7128 ADC, the BNO055 #gls("imu"), and the VL53L1X distance sensors. A #gls("usart") carries the traffic of the ESP8266 WiFi bridge, and the #gls("pwm") timers drive the motor and steering actuators. The corresponding firmware implementation is described in @sec:i2c-stack and @sec:actuator-control.
 
 The Nucleo-64 board provides the infrastructure required for development, including an on-board STLINK-V3EC debugger and programmer, headers exposing the I/O of the STM32 for test wiring, and support for the STM32CubeMX and STM32CubeIDE toolchain used to generate the peripheral initialization code @STM32CubeMX2026.
 
@@ -79,7 +79,7 @@ matters on a track where the car measures its distance to wooden barriers.
   caption: [VL53L1X distance sensor, Pimoroni breakout board, front and back #imgsrc(<PimoroniVL53L1XBreakout2026>)],
 ) <fig:tof-sensor>
 
-Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address, so the three sensors cannot share a single bus without further measures. Each sensor provides an active-low XSHUT pin that holds it in standby @VL53L1X2024. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
+Each of the three sensors is mounted on a Pimoroni breakout board, shown in @fig:tof-sensor, and communicates over #gls("i2c") at up to 400 kHz. All VL53L1X devices start up with the same fixed address of 0x52, so the three sensors cannot share a single bus without further measures. Every I2C address in this thesis is given in 8-bit notation, which is the 7-bit address shifted left by one and the form the STM32 HAL expects. The datasheet and the marking on the breakout board state the 7-bit value 0x29 @VL53L1X2024. Each sensor provides an active-low XSHUT pin that holds it in standby. The firmware uses these pins to activate the sensors individually at startup and assign a separate address to each. @sec:i2c-stack describes this sequence.
 
 Ranging is tuned through three settings. The distance mode trades range against
 immunity to ambient light. Long mode reaches the maximum ranging distance of
