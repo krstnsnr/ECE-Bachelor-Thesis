@@ -7,8 +7,8 @@
 
 The hardware of this thesis builds on the XRAY M18 Pro LiPo shown in
 @fig:chassis, a 1/18-scale, four-wheel-drive shaft-drive touring car kit from
-XRAY @MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase of 150 mm.
-The kit weighs 165 g, and 440 g in ready-to-run configuration. The main chassis plate is #gls("cnc")-machined
+XRAY @MichaelsRCXRAYM18Pro2026. It measures 220 mm in length with a wheelbase
+of 150 mm. The main chassis plate is #gls("cnc")-machined
 from 1.6 mm carbon fiber, thin enough to flex a little on a low-grip
 surface but stiff enough to hold its line at higher speeds. XRAY's Multi-Flex
 top deck enables that flex to be tuned separately at the front and
