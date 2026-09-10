@@ -138,7 +138,7 @@ follows from the change in error since the last call. The three terms
 are summed, and the result is clamped to the output range of the
 controller before it is returned.
 
-This is a standard parallel-form PID controller @SallokerRTEA. The
+This is a standard parallel-form PID controller @Braunl2008. The
 clamped integral prevents windup while the output is saturated, and
 the final output clamp restricts the result to the range the actuator
 can accept.
