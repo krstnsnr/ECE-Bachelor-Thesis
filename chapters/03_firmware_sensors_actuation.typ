@@ -110,8 +110,7 @@ battery voltage through a 10 kΩ/18 kΩ divider. The other two read the
 negative and positive-side current-sense outputs of the BTN9970LV
 half-bridge motor drivers described in @sec:motor-drivers. The current
 on the IS pin of each driver is converted to a voltage across a
-2 kΩ sense resistor before it reaches the ADC channel. Both the divider
-and the sense resistor are set by the main PCB @LaesserXRayLegacy2023.
+2 kΩ sense resistor before it reaches the ADC channel.
 
 The rest of the firmware works with physical units only. Above the
 channel-select and read functions, the driver exposes two getters,
