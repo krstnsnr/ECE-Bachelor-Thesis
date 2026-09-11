@@ -33,7 +33,7 @@ The board carries the #gls("i2c") sensor stack, the motor and steering drivers, 
 This thesis is the first work to put this very version of the board into operation and to evaluate it under load. The design oversights identified in the process are reported in @sec:pcb-impact-summary.
 
 #figure(
-  image("/assets/pictures/XRayLegacy_PCB_TopView.png", width: 70%),
+  image("/assets/pictures/XRayLegacy_PCB_TopView.png", width: 65%),
   caption: [XRay Legacy V1 PCB, top view #imgsrc(<LaesserXRayLegacy2023>)],
 ) <fig:main-pcb>
 
@@ -44,7 +44,7 @@ development board carrying an STM32H533RET6 microcontroller
 @UM3121_2025. The choice of the microcontroller was determined by the "Embedded Systems" course and its orientation toward the future lab classes. It also proved well suited to the requirements of the firmware. @fig:nucleo-board shows the top and bottom layout of the board.
 
 #figure(
-  image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 70%),
+  image("/assets/pictures/NUCLEO_Board_Top_and_Bottom_view.png", width: 65%),
   caption: [STM32H5 Nucleo-64 board (MB1814), top and bottom layout #imgsrc(<UM3121_2025>)],
 ) <fig:nucleo-board>
 

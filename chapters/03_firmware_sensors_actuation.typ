@@ -65,7 +65,7 @@ used. @fig:i2c-startup shows the startup order and the address
 assigned to each device.
 
 #figure(
-  image("/assets/graphics/selfdrawn/i2c_startup_sequence.svg", width: 85%),
+  image("/assets/graphics/selfdrawn/i2c_startup_sequence.svg", width: 100%),
   caption: [I2C1 startup sequence and address assignment],
 ) <fig:i2c-startup>
 
